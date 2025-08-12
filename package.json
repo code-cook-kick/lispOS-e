@@ -1,0 +1,27 @@
+{
+  "name": "lispos-e",
+  "version": "1.0.0",
+  "description": "A complete Lisp interpreter implementation in JavaScript with comprehensive tokenization, parsing, and evaluation capabilities.",
+  "homepage": "https://github.com/code-cook-kick/lispOS-e#readme",
+  "bugs": {
+    "url": "https://github.com/code-cook-kick/lispOS-e/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-cook-kick/lispOS-e.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "fs": "^0.0.1-security"
+  }
+}

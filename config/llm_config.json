@@ -1,0 +1,250 @@
+{
+  "version": "2.0.0",
+  "description": "Unified LLM Configuration for Etherney Legal System",
+  "interface": {
+    "enabled": true,
+    "max_concurrent_connections": 5,
+    "default_timeout_ms": 30000,
+    "retry_attempts": 3,
+    "rate_limiting": {
+      "enabled": true,
+      "requests_per_minute": 60,
+      "burst_limit": 10
+    }
+  },
+  "backends": {
+    "ollama": {
+      "enabled": true,
+      "base_url": "http://192.168.3.18:11434",
+      "models": ["deepseek-r1:14b", "mistral", "llama2", "codellama", "neural-chat", "phi", "gemma"],
+      "default_model": "deepseek-r1:14b",
+      "parameters": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "max_tokens": 2048,
+        "stop": ["</response>", "Human:", "Assistant:"]
+      },
+      "timeout_ms": 60000,
+      "retry_attempts": 3
+    },
+    "openai": {
+      "enabled": true,
+      "base_url": "https://api.openai.com/v1",
+      "api_key": null,
+      "models": ["gpt-4", "gpt-3.5-turbo", "gpt-4-turbo", "gpt-4o", "gpt-4o-mini"],
+      "default_model": "gpt-4o-mini",
+      "parameters": {
+        "temperature": 0.3,
+        "max_tokens": 4096,
+        "top_p": 1.0,
+        "frequency_penalty": 0,
+        "presence_penalty": 0
+      }
+    },
+    "gemini": {
+      "enabled": true,
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "api_key": null,
+      "models": ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro", "gemini-pro-vision"],
+      "default_model": "gemini-1.5-flash",
+      "parameters": {
+        "temperature": 0.7,
+        "maxOutputTokens": 2048,
+        "topP": 0.9,
+        "topK": 40
+      }
+    },
+    "anthropic": {
+      "enabled": false,
+      "base_url": "https://api.anthropic.com/v1",
+      "api_key": null,
+      "models": ["claude-3-sonnet-20240229", "claude-3-haiku-20240307", "claude-2.1"],
+      "default_model": "claude-3-haiku-20240307",
+      "parameters": {
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "top_p": 1.0
+      }
+    },
+    "local_api": {
+      "enabled": false,
+      "base_url": "http://localhost:8000",
+      "api_key": null,
+      "models": ["custom-model", "local-llama", "local-mistral"],
+      "default_model": "custom-model",
+      "parameters": {
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "top_p": 0.9
+      }
+    }
+  },
+  "conversation": {
+    "maintain_context": true,
+    "max_context_length": 10,
+    "context_compression": true,
+    "system_prompts": {
+      "default": "You are a helpful AI assistant collaborating with another AI system. Provide clear, accurate, and helpful responses.",
+      "legal": "You are a legal AI assistant integrated with a symbolic reasoning system. Your role is to enhance explanations of legal conclusions that have already been derived through formal logical reasoning. You must ONLY explain conclusions that were derived by the symbolic reasoner and stay within provided templates.",
+      "technical": "You are a technical AI assistant helping with code analysis, system design, and technical problem-solving. Focus on accuracy and practical solutions.",
+      "creative": "You are a creative AI assistant helping with writing, ideation, and creative problem-solving. Be imaginative while staying helpful.",
+      "analytical": "You are an analytical AI assistant focused on data analysis, logical reasoning, and systematic problem-solving.",
+      "collaborative": "You are working as part of a multi-AI system. Coordinate effectively and provide complementary insights to other AI agents."
+    }
+  },
+  "security": {
+    "sanitize_inputs": true,
+    "validate_responses": true,
+    "content_filtering": true,
+    "audit_all_interactions": true,
+    "max_prompt_length": 50000,
+    "max_response_length": 50000,
+    "blocked_patterns": [
+      "(?i)execute.*system",
+      "(?i)run.*command",
+      "(?i)delete.*file"
+    ],
+    "template_constraints": true,
+    "fact_verification": true,
+    "require_symbolic_grounding": true
+  },
+  "features": {
+    "multi_llm_comparison": true,
+    "conversation_mode": true,
+    "context_management": true,
+    "response_caching": false,
+    "load_balancing": false,
+    "failover": true,
+    "streaming_responses": false,
+    "query_understanding": true,
+    "explanation_generation": true,
+    "legal_concept_explanation": true
+  },
+  "logging": {
+    "log_all_interactions": true,
+    "log_performance_metrics": true,
+    "log_security_events": true,
+    "audit_file": "logs/llm_interface_audit.log",
+    "comprehensive_logging": {
+      "enabled": true,
+      "level": "DETAILED",
+      "log_file": "logs/llm-interface.log",
+      "max_file_size": 10485760,
+      "max_files": 5,
+      "sanitize_in_production": true,
+      "track_performance": true,
+      "use_security_module": true,
+      "environment": "development"
+    }
+  },
+  "performance": {
+    "connection_pooling": true,
+    "request_queuing": true,
+    "parallel_requests": 3,
+    "cache_responses": false,
+    "cache_ttl_seconds": 300
+  },
+  "monitoring": {
+    "health_checks": true,
+    "health_check_interval_ms": 60000,
+    "performance_tracking": true,
+    "error_tracking": true,
+    "usage_analytics": true
+  },
+  "task_specific_models": {
+    "facts_extraction": {
+      "model": "gpt-4o-mini",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.2,
+        "max_tokens": 2048,
+        "top_p": 0.9
+      }
+    },
+    "events_extraction": {
+      "model": "gpt-4o-mini",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.2,
+        "max_tokens": 2048,
+        "top_p": 0.9
+      }
+    },
+    "rule_generation": {
+      "model": "gpt-4o",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.3,
+        "max_tokens": 4096,
+        "top_p": 0.95
+      }
+    },
+    "legal_analysis": {
+      "model": "gpt-4o",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.3,
+        "max_tokens": 4096,
+        "top_p": 0.95
+      }
+    },
+    "gap_detection": {
+      "model": "gpt-4o-mini",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.1,
+        "max_tokens": 1024,
+        "top_p": 0.8
+      }
+    },
+    "query_understanding": {
+      "model": "gpt-4o-mini",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.1,
+        "max_tokens": 200,
+        "top_p": 0.9
+      }
+    },
+    "explanation_generation": {
+      "model": "gpt-4o",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.2,
+        "max_tokens": 1000,
+        "top_p": 0.9
+      }
+    },
+    "concept_explanation": {
+      "model": "gpt-4o-mini",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.1,
+        "max_tokens": 300,
+        "top_p": 0.9
+      }
+    },
+    "final_opinion": {
+      "model": "gpt-4o",
+      "backend": "openai",
+      "parameters": {
+        "temperature": 0.3,
+        "max_tokens": 800,
+        "top_p": 0.9
+      }
+    }
+  },
+  "safety": {
+    "template_constraints": true,
+    "fact_verification": true,
+    "require_symbolic_grounding": true,
+    "max_explanation_length": 1000,
+    "fallback_to_mock": true
+  },
+  "llm": {
+    "enabled": true,
+    "fallback_to_mock": true,
+    "timeout_ms": 30000,
+    "max_retries": 3
+  }
+}
