@@ -1,7 +1,7 @@
 const readline = require("readline");
 const { LispTokenizer } = require("./tokenizer");
 const { evalNode, createGlobalEnv } = require("./evaluator");
-const { parseTokens } = require("./parser"); // ensure parser exports a parse function
+const { LispParser } = require("./parser");
 
 const env = createGlobalEnv();
 const rl = readline.createInterface({
@@ -14,9 +14,8 @@ rl.prompt();
 
 rl.on("line", (line) => {
     try {
-        const tokenizer = new LispTokenizer(line);
-        const tokens = tokenizer.tokenize();
-        const ast = parseTokens(tokens); // top-level AST
+        const parser = new LispParser(line);
+        const ast = parser.parse(); // returns array of top-level AST nodes
         const result = ast.map(node => evalNode(node, env));
         console.log(result[result.length - 1]);
     } catch (err) {

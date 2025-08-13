@@ -2,6 +2,24 @@ class Environment {
     constructor(parent = null) {
         this.vars = new Map();
         this.parent = parent;
+        
+        // Initialize macro registry - inherit from parent or create new
+        if (parent && parent.macros) {
+            // Share the same macro registry with parent (macros are global)
+            this.macros = parent.macros;
+        } else {
+            // Only create new registry if this is the root environment
+            this.macros = new Map();
+        }
+        
+        // Macro registry methods - always available
+        this.defineMacro = function(name, transformer) {
+            this.macros.set(name, transformer);
+        };
+        
+        this.lookupMacro = function(name) {
+            return this.macros.get(name);
+        };
     }
 
     define(name, value) {

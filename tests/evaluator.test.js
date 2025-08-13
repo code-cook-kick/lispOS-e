@@ -227,6 +227,52 @@ class TestRunner {
             this.assertEqual(result[0], -6);
         });
 
+        // IF special form tests
+        this.test('If with true condition', () => {
+            const result = this.evalLisp('(if (> 5 3) 42 0)');
+            this.assertEqual(result[0], 42);
+        });
+
+        this.test('If with false condition', () => {
+            const result = this.evalLisp('(if (< 5 3) 42 0)');
+            this.assertEqual(result[0], 0);
+        });
+
+        this.test('If without else clause (true)', () => {
+            const result = this.evalLisp('(if (> 5 3) 42)');
+            this.assertEqual(result[0], 42);
+        });
+
+        this.test('If without else clause (false)', () => {
+            const result = this.evalLisp('(if (< 5 3) 42)');
+            this.assertEqual(result[0], null);
+        });
+
+        this.test('If with false boolean', () => {
+            const result = this.evalLisp('(if #f 42 0)');
+            this.assertEqual(result[0], 0);
+        });
+
+        this.test('If with arithmetic condition', () => {
+            const result = this.evalLisp('(if (= (+ 2 3) 5) 100 200)');
+            this.assertEqual(result[0], 100);
+        });
+
+        this.test('Nested if statements', () => {
+            const result = this.evalLisp('(if (> 10 5) (if (> 3 1) 99 88) 77)');
+            this.assertEqual(result[0], 99);
+        });
+
+        this.test('If truthiness - zero is truthy', () => {
+            const result = this.evalLisp('(if 0 1 2)');
+            this.assertEqual(result[0], 1);
+        });
+
+        this.test('If truthiness - empty list is truthy', () => {
+            const result = this.evalLisp('(if (list) 1 2)');
+            this.assertEqual(result[0], 1);
+        });
+
         // Summary
         console.log(`\nEvaluator Tests Complete:`);
         console.log(`  Passed: ${this.passed}`);

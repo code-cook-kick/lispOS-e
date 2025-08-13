@@ -1,0 +1,17 @@
+Etherney eLisp Macro System – Future TODOs (Post
+Production) 
+These are not blocking production and can be addressed later as enhancements. 
+1. Advanced Macro-in-Macro Support 
+Issue: Failing Test 1d
+Details: Complex nested macros that define other macros within expansion.
+Goal: Improve expansion pipeline to handle multi-stage macro generation without manual macroexpand calls. 
+2. LIST AST Handling in Variadic Contexts 
+Issue: Failing Test 3a
+Details: Variadic macros returning deep list AST structures require manual quoting/unquoting.
+Goal: Refine expansion rules to preserve list structures without extra (quote ...). 
+3. Improved Error Feedback 
+Provide precise source location and macro name in error messages.
+Helpful for debugging complex statute/event/fact macro definitions. 
+4. Macro Hygiene Enhancements 
+Avoid accidental variable capture between macro body and caller context.
+Consider using gensym or equivalent unique symbol generator.

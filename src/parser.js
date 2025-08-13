@@ -144,13 +144,15 @@ class LispParser {
                 return this.parseList();
             case 'QUOTE':
                 return this.parseQuote();
+            case 'DOT':
+                return this.parseDot();
             case 'EOF':
                 return null;
             default:
                 throw new ParseError(
                     `Unexpected token: ${token.type} '${token.value}'`,
                     token,
-                    ['NUMBER', 'STRING', 'SYMBOL', 'BOOLEAN', 'LPAREN', 'QUOTE']
+                    ['NUMBER', 'STRING', 'SYMBOL', 'BOOLEAN', 'LPAREN', 'QUOTE', 'DOT']
                 );
         }
     }
@@ -284,6 +286,19 @@ class LispParser {
             null,
             [quotedExpr],
             { line: quoteToken.line, column: quoteToken.column, position: quoteToken.position }
+        );
+    }
+
+    /**
+     * Parse a dot token (for variadic parameters)
+     */
+    parseDot() {
+        const token = this.advance();
+        return new ASTNode(
+            'DOT',
+            '.',
+            [],
+            { line: token.line, column: token.column, position: token.position }
         );
     }
 

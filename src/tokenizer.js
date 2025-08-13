@@ -127,12 +127,23 @@ class LispTokenizer {
                 return this.boolean(startLine, startColumn, startPosition);
                 
             default:
+                // Try to parse as number first (digits or negative sign followed by digit)
                 if (this.isDigit(char) || (char === '-' && this.isDigit(this.peekNext()))) {
-                    return this.number(startLine, startColumn, startPosition);
+                    // Look ahead to see if this looks like a number
+                    if (this.looksLikeNumber()) {
+                        return this.number(startLine, startColumn, startPosition);
+                    }
                 }
                 
+                // Try to parse as symbol
                 if (this.isSymbolStart(char)) {
                     return this.symbol(startLine, startColumn, startPosition);
+                }
+                
+                // Handle single dot - allow as DOT token for variadic parameters
+                if (char === '.') {
+                    this.advance();
+                    return new Token('DOT', '.', startLine, startColumn, startPosition);
                 }
                 
                 throw new TokenizerError(
@@ -374,25 +385,31 @@ class LispTokenizer {
     }
 
     isSymbolStart(char) {
-        return this.isAlpha(char) || 
-               '+-*/<>=!?_$%&^~|'.includes(char);
+        return this.isAlpha(char) ||
+               '+-*/<>=!?_$%&^~|:'.includes(char);
     }
 
     isSymbolChar(char) {
-        return this.isAlpha(char) || 
-               this.isDigit(char) || 
-               '+-*/<>=!?_$%&^~|.-'.includes(char);
+        return this.isAlpha(char) ||
+               this.isDigit(char) ||
+               '+-*/<>=!?_$%&^~|.-:'.includes(char);
     }
 
     isValidSymbol(symbol) {
         // Symbol cannot be empty
         if (symbol.length === 0) return false;
         
+        // Symbol cannot be just a dot or multiple dots
+        if (/^\.+$/.test(symbol)) return false;
+        
         // Symbol cannot start with a digit (unless it's a special operator like +, -, etc.)
         if (this.isDigit(symbol[0]) && symbol.length > 1) return false;
         
-        // Symbol cannot be just a number
-        if (/^-?\d+\.?\d*$/.test(symbol)) return false;
+        // Symbol cannot be just a number (including decimals)
+        if (/^-?\d+(\.\d+)?$/.test(symbol)) return false;
+        
+        // Symbol cannot start with a dot (keep it simple, avoid ambiguity)
+        if (symbol[0] === '.') return false;
         
         // All characters must be valid symbol characters
         for (const char of symbol) {
@@ -400,6 +417,52 @@ class LispTokenizer {
         }
         
         return true;
+    }
+
+    /**
+     * Look ahead to determine if the current position starts a number
+     * This helps distinguish between numbers and symbols that start with - or digits
+     */
+    looksLikeNumber() {
+        let pos = this.position;
+        
+        // Handle negative sign
+        if (pos < this.source.length && this.source[pos] === '-') {
+            pos++;
+        }
+        
+        // Must have at least one digit
+        if (pos >= this.source.length || !this.isDigit(this.source[pos])) {
+            return false;
+        }
+        
+        // Skip digits
+        while (pos < this.source.length && this.isDigit(this.source[pos])) {
+            pos++;
+        }
+        
+        // Check for decimal point
+        if (pos < this.source.length && this.source[pos] === '.') {
+            pos++;
+            // Must have digits after decimal point
+            if (pos >= this.source.length || !this.isDigit(this.source[pos])) {
+                return false;
+            }
+            // Skip remaining digits
+            while (pos < this.source.length && this.isDigit(this.source[pos])) {
+                pos++;
+            }
+        }
+        
+        // Check that the number ends with a delimiter (whitespace, paren, etc.)
+        if (pos < this.source.length) {
+            const nextChar = this.source[pos];
+            return nextChar === ' ' || nextChar === '\t' || nextChar === '\n' ||
+                   nextChar === '\r' || nextChar === '(' || nextChar === ')' ||
+                   nextChar === ';' || nextChar === '"' || nextChar === '\'';
+        }
+        
+        return true; // End of input
     }
 
     /**
