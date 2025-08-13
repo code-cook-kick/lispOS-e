@@ -75,7 +75,7 @@
 (print "3. Testing User's Original Examples...")
 
 ;; Test 3a: Original variadic macro from user's request
-(defmacro test1 (x . rest) (list 'list "result" x rest))
+(defmacro test1 (x . rest) (list 'list "result" x (length rest)))
 (define result3a (test1 1 2 3))
 (print (list "Test 3a: (test1 1 2 3) =" result3a))
 
