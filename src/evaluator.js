@@ -170,6 +170,12 @@ function evalList(list, env) {
                 return evalListForm(rest, env);
             case "defmacro":
                 return evalDefmacro(rest, env);
+            case "and":
+                return evalAnd(rest, env);
+            case "or":
+                return evalOr(rest, env);
+            case "let":
+                return evalLet(rest, env);
         }
         
         // Macro expansion ONLY if head is a SYMBOL that names a macro
@@ -333,6 +339,86 @@ function evalDefmacro(args, env) {
     return nameNode.value;
 }
 
+/**
+ * Evaluate and special form with short-circuit semantics
+ * Syntax: (and expr1 expr2 ...)
+ * Returns first falsy value or last value if all truthy
+ */
+function evalAnd(args, env) {
+    if (args.length === 0) return true;
+    
+    for (let i = 0; i < args.length; i++) {
+        const value = evalNode(args[i], env);
+        // In Lisp, only false and nil are falsy
+        if (value === false || value === null) {
+            return value;
+        }
+        // If this is the last argument, return its value
+        if (i === args.length - 1) {
+            return value;
+        }
+    }
+}
+
+/**
+ * Evaluate or special form with short-circuit semantics
+ * Syntax: (or expr1 expr2 ...)
+ * Returns first truthy value or last value if all falsy
+ */
+function evalOr(args, env) {
+    if (args.length === 0) return false;
+    
+    for (let i = 0; i < args.length; i++) {
+        const value = evalNode(args[i], env);
+        // In Lisp, only false and nil are falsy
+        if (value !== false && value !== null) {
+            return value;
+        }
+        // If this is the last argument, return its value
+        if (i === args.length - 1) {
+            return value;
+        }
+    }
+}
+
+/**
+ * Evaluate let special form for local bindings
+ * Syntax: (let ((var1 val1) (var2 val2) ...) body)
+ * Creates new environment with local bindings
+ */
+function evalLet(args, env) {
+    if (args.length !== 2) {
+        throw new Error("let requires exactly 2 arguments: bindings and body");
+    }
+    
+    const [bindingsNode, bodyNode] = args;
+    
+    if (bindingsNode.type !== "LIST") {
+        throw new Error("let bindings must be a list");
+    }
+    
+    // Create new environment for local bindings
+    const letEnv = new Environment(env);
+    
+    // Process each binding
+    for (const binding of bindingsNode.children) {
+        if (binding.type !== "LIST" || binding.children.length !== 2) {
+            throw new Error("let binding must be a list of exactly 2 elements: (var value)");
+        }
+        
+        const [varNode, valueNode] = binding.children;
+        if (varNode.type !== "SYMBOL") {
+            throw new Error("let binding variable must be a symbol");
+        }
+        
+        const value = evalNode(valueNode, env); // Evaluate in original environment
+        letEnv.define(varNode.value, value);
+    }
+    
+    // Evaluate body in new environment
+    return evalNode(bodyNode, letEnv);
+}
+
 function evalListForm(args, env) {
     return args.map(arg => evalNode(arg, env));
 }
@@ -454,6 +540,51 @@ function createGlobalEnv() {
             throw new Error("filter requires a list as second argument");
         }
         return list.filter(item => fn(item));
+    });
+
+    // Type checking
+    env.define("type-of", (value) => {
+        if (typeof value === 'function') return 'function';
+        if (typeof value === 'number') return 'number';
+        if (typeof value === 'string') return 'string';
+        if (typeof value === 'boolean') return 'boolean';
+        if (value === null || value === undefined) return 'nil';
+        if (Array.isArray(value)) return 'list';
+        if (value && typeof value === 'object' && value.type) return 'ast-node';
+        return 'object';
+    });
+
+    // Apply function for higher-order patterns
+    env.define("apply", (fn, args) => {
+        if (typeof fn !== 'function') {
+            throw new Error("apply requires a function as first argument");
+        }
+        if (!Array.isArray(args)) {
+            throw new Error("apply requires a list as second argument");
+        }
+        return fn(...args);
+    });
+
+    // Map over two lists (map2)
+    env.define("map2", (fn, list1, list2) => {
+        if (typeof fn !== 'function') {
+            throw new Error("map2 requires a function as first argument");
+        }
+        if (!Array.isArray(list1) || !Array.isArray(list2)) {
+            throw new Error("map2 requires lists as second and third arguments");
+        }
+        const minLength = Math.min(list1.length, list2.length);
+        const result = [];
+        for (let i = 0; i < minLength; i++) {
+            result.push(fn(list1[i], list2[i]));
+        }
+        return result;
+    });
+
+    // Logical operations
+    env.define("not", (value) => {
+        // In Lisp, only false and nil are falsy
+        return value === false || value === null;
     });
 
     // Printing

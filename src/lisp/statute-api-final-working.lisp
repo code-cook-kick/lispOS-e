@@ -125,9 +125,9 @@
 ; =============================================================================
 
 ; Create a statute as simple data structure (no lambda storage)
-; Returns: ('statute id title weight props)
-(define statute.make (lambda (id title props)
-  (list 'statute id title 0 props)))
+; Returns: ('statute id title when then weight props)
+(define statute.make (lambda (id title when then props)
+  (list 'statute id title when then 0 props)))
 
 ; Get statute ID (position 1)
 (define statute.id (lambda (s)
@@ -137,13 +137,13 @@
 (define statute.title (lambda (s)
   (nth s 2)))
 
-; Get statute weight (position 3)
+; Get statute weight (position 5)
 (define statute.weight (lambda (s)
-  (nth s 3)))
+  (nth s 5)))
 
-; Get statute props (position 4)
+; Get statute props (position 6)
 (define statute.props (lambda (s)
-  (nth s 4)))
+  (nth s 6)))
 
 ; Create new statute with updated weight (pure - no mutation)
 (define statute.with-weight (lambda (s w)
@@ -205,7 +205,7 @@
 (print "")
 
 ; Create the S774 statute
-(define S774 (statute.make 'S774 "Intestate (equal split demo)" (list)))
+(define S774 (statute.make 'S774 "Intestate (equal split demo)" (lambda (ev) #t) (lambda (ev) '()) (list)))
 
 (print "S774 statute created:")
 (print "ID:" (statute.id S774))
@@ -293,3 +293,165 @@
 (define statute-make statute.make)
 (define statute-id statute.id)
 (define statute-weight statute.weight)
+
+; =============================================================================
+; MISSING HELPER FUNCTIONS FOR TESTATE SUCCESSION
+; =============================================================================
+
+; Property list helpers
+(define plist-get-safe
+  (lambda (plist k)
+    (if (< (length plist) 2)
+        #f
+        (if (eq? (first plist) k)
+            (second plist)
+            (plist-get-safe (rest (rest plist)) k)))))
+
+(define plist-put-safe
+  (lambda (plist k v)
+    (if (eq? (length plist) 0)
+        (list k v)
+        (if (eq? (first plist) k)
+            (cons k (cons v (rest (rest plist))))
+            (cons (first plist) (cons (second plist) (plist-put-safe (rest (rest plist)) k v)))))))
+
+; List equality helper
+(define equal-lists?
+  (lambda (a b)
+    (if (and (eq? (length a) 0) (eq? (length b) 0))
+        #t
+        (if (or (eq? (length a) 0) (eq? (length b) 0))
+            #f
+            (if (eq? (first a) (first b))
+                (equal-lists? (rest a) (rest b))
+                #f)))))
+
+; Safe append helper
+(define safe-append
+  (lambda (a b)
+    (if (eq? (length a) 0)
+        b
+        (cons (first a) (safe-append (rest a) b)))))
+
+; Safe filter helper
+(define safe-filter
+  (lambda (pred lst)
+    (if (eq? (length lst) 0)
+        (list)
+        (if (pred (first lst))
+            (cons (first lst) (safe-filter pred (rest lst)))
+            (safe-filter pred (rest lst))))))
+
+; Safe map helper
+(define safe-map
+  (lambda (fn lst)
+    (if (eq? (length lst) 0)
+        (list)
+        (cons (fn (first lst)) (safe-map fn (rest lst))))))
+
+; Safe fold helper
+(define safe-fold
+  (lambda (fn init lst)
+    (if (eq? (length lst) 0)
+        init
+        (safe-fold fn (fn init (first lst)) (rest lst)))))
+
+; Safe length helper
+(define safe-length
+  (lambda (lst)
+    (if (eq? (length lst) 0)
+        0
+        (+ 1 (safe-length (rest lst))))))
+
+; Safe empty check
+(define safe-empty?
+  (lambda (lst)
+    (eq? (length lst) 0)))
+
+; As-list helper
+(define as-list
+  (lambda (x)
+    (if (eq? x null) (list) x)))
+
+; Statute get helper
+(define statute.get
+  (lambda (s key)
+    (plist-get-safe (statute.props s) key)))
+
+; Spawn statute function (from lambda-rules.lisp)
+(define spawn-statute
+  (lambda (id title when-l then-l props)
+    (statute.make id title when-l then-l (as-list props))))
+
+; Additional predicate combinators needed
+(define when-all
+  (lambda preds
+    (lambda (ev)
+      (define check-all
+        (lambda (ps)
+          (if (eq? (length ps) 0)
+              #t
+              (if ((first ps) ev)
+                  (check-all (rest ps))
+                  #f))))
+      (check-all preds))))
+
+(define when-not
+  (lambda (p)
+    (lambda (ev) (not (p ev)))))
+
+(define when-any
+  (lambda preds
+    (lambda (ev)
+      (define check-any
+        (lambda (ps)
+          (if (eq? (length ps) 0)
+              #f
+              (if ((first ps) ev)
+                  #t
+                  (check-any (rest ps))))))
+      (check-any preds))))
+
+; Domain predicates needed
+(define p-death
+  (lambda (ev)
+    (and (not (eq? ev null))
+         (eq? (event.type ev) 'death))))
+
+(define p-no-will
+  (lambda (ev)
+    (if (eq? ev null)
+        #f
+        (let ((fs (as-list (event.get ev ':flags))))
+          (and (not (safe-empty? fs))
+               (contains? fs 'no-will))))))
+
+(define p-jurisdiction
+  (lambda (jur)
+    (lambda (ev)
+      (if (eq? ev null)
+          #f
+          (eq? (event.get ev ':jurisdiction) jur)))))
+
+; Contains helper
+(define contains?
+  (lambda (lst elem)
+    (if (eq? (length lst) 0)
+        #f
+        (if (eq? (first lst) elem)
+            #t
+            (contains? (rest lst) elem)))))
+
+; =============================================================================
+; COMPATIBILITY ALIASES FOR DOT VS DASH NAMING
+; =============================================================================
+
+; Aliases for dot vs dash naming (belt & suspenders approach)
+(define event-make   event.make)
+(define fact-make    fact.make)
+(define statute-make statute.make)
+
+; Reverse aliases in case some macros expand to dash names
+(define event.make   event-make)
+(define fact.make    fact-make)
+(define statute.make statute-make)
