@@ -1,426 +1,381 @@
-# Etherney Lisp Machine
+# Etherney-LISP Legal Knowledge Packs
 
-A complete Lisp interpreter implementation in JavaScript with comprehensive tokenization, parsing, and evaluation capabilities.
+A complete, production-quality monorepo for jurisdiction-aware legal knowledge packs designed for the Etherney-LISP symbolic reasoning engine. This repository provides comprehensive coverage of legal domains with maximum breadth and future extensibility.
 
-## Overview
+## 🏛️ Overview
 
-The Etherney Lisp Machine is a fully functional Lisp interpreter that provides:
+This monorepo organizes **jurisdiction-aware legal rulepacks** for symbolic reasoning applications. It includes:
 
-- **Complete Lisp Language Support**: Numbers, strings, symbols, lists, quotes, and boolean literals
-- **Interactive REPL**: Read-Eval-Print Loop for interactive development
-- **Robust Error Handling**: Comprehensive error reporting with source location tracking
-- **Extensible Architecture**: Clean modular design for easy extension and modification
-- **Educational Focus**: Well-documented code suitable for learning interpreter design
+- **Comprehensive Legal Taxonomy**: Complete coverage of legal fields for PH (Philippines) and GLOBAL jurisdictions
+- **Production-Ready Tooling**: Validation, linting, building, and testing tools
+- **Multiple Interfaces**: Browser demo and server-side evaluation interfaces
+- **Extensible Architecture**: Template-based scaffolding for new jurisdictions and legal fields
 
-## Quick Start
+## 📁 Repository Structure
+
+```
+etherney-lisp-legal-knowledgepacks/
+├── packs/legal/           # Legal knowledge packs by jurisdiction
+│   ├── PH/               # Philippines legal packs
+│   └── GLOBAL/           # Cross-border/international law packs
+├── tools/                # CLI tools and utilities
+├── webapp/               # Browser-based demo interface
+├── server/               # Server-side evaluation interface
+├── docs/                 # Documentation
+└── reports/              # Test and build reports
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- **Node.js**: Version 12.0 or higher
-  - Download from [nodejs.org](https://nodejs.org/)
-  - Verify installation: `node --version`
-- **Git**: For cloning the repository
-  - Download from [git-scm.com](https://git-scm.com/)
-  - Verify installation: `git --version`
+- Node.js 18.0.0 or higher
+- npm (comes with Node.js)
+- bash (for scaffolding scripts)
 
 ### Installation
-
-#### Option 1: Clone from Repository
 
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd lispOS-e
+cd etherney-lisp-legal-knowledgepacks
 
-# Verify files are present
-ls -la
-# Should show: index.js, src/, docs/, README.md
-
-# No additional dependencies required
+# Install dependencies
+npm run setup
 ```
 
-#### Option 2: Download and Extract
-
-1. Download the project as a ZIP file
-2. Extract to your desired location
-3. Open terminal/command prompt in the project directory
-
-### Running the REPL
+### Basic Usage
 
 ```bash
-# Start the interactive Lisp REPL
-node index.js
+# Validate all knowledge packs
+npm run validate
+
+# Lint .ether files
+npm run lint
+
+# Build packages
+npm run build
+
+# Run golden tests
+npm run test
+
+# Start server interface
+npm run server
+
+# Start browser demo
+npm run webapp
 ```
 
-You'll see the Lisp prompt:
-```
-elisp>
-```
+## 📚 Legal Domain Coverage
 
-### Running Lisp Files
+### Philippines (PH)
+- Constitutional Law
+- Administrative Law
+- Civil Law (Obligations, Contracts, Property, Family, Succession, Torts)
+- Criminal Law
+- Evidence & Procedure
+- Labor & Employment
+- Tax Law
+- Commercial & Corporate
+- And 25+ more specialized fields
 
-You can also execute Lisp files directly:
+### Global (GLOBAL)
+- Public International Law
+- Private International Law
+- Human Rights
+- Environmental Law
+- Maritime & Admiralty
+- And comprehensive international coverage
 
-```bash
-# Execute a single Lisp file
-node src/file-runner.js src/lisp/initial-test.lisp
+## 🛠️ Tools & Scripts
 
-# Execute multiple files in sequence
-node src/file-runner.js file1.lisp file2.lisp file3.lisp
-```
+### Core Tools
 
-#### Try the Demo Script
+- **`tools/scaffold.sh`** - Create new legal knowledge packs
+- **`tools/validate.js`** - Validate pack structure and metadata
+- **`tools/lint-ether.js`** - Lint .ether files for compliance
+- **`tools/lint-cons.js`** - Detect unsafe cons usage patterns
+- **`tools/codemod-cons.js`** - Automatically fix cons misuse
+- **`tools/build-packs.js`** - Build and package knowledge packs
+- **`tools/run-golden.js`** - Execute golden test suites
 
-```bash
-# Run the comprehensive test script
-node src/file-runner.js src/lisp/initial-test.lisp
-```
+### Cons Safety Guidelines
 
-This will execute a comprehensive test script that demonstrates all interpreter features.
+**⚠️ IMPORTANT**: Our Etherney eLISP interpreter enforces strict cons usage. The second argument to `cons` must always be a list, never a scalar value.
 
-### Verification
-
-Test the installation with these commands:
+#### Safe Patterns
 
 ```lisp
-elisp> (+ 1 2 3)
-6
+; ✅ GOOD: Second argument is a list
+(cons 'item '())
+(cons 'item '(1 2 3))
+(cons 'item (list 1 2 3))
 
-elisp> (print "Hello, Lisp!")
-Hello, Lisp!
-"Hello, Lisp!"
-
-elisp> '(this is a list)
-LIST(null)
+; ✅ GOOD: Use safe utilities
+(list 'key 'value)           ; For 2-tuples
+(kv 'key 'value)            ; For alist entries
+(cons 'item (ensure-list x)) ; When x might not be a list
 ```
 
-If you see the expected outputs, the installation is successful!
-
-### System Requirements
-
-- **Operating System**: Windows, macOS, or Linux
-- **Memory**: Minimum 512MB RAM
-- **Disk Space**: Less than 1MB for the interpreter
-- **Terminal**: Command line interface for REPL interaction
-
-### Basic Usage Examples
+#### Unsafe Patterns
 
 ```lisp
-elisp> (+ 1 2 3)
-6
-
-elisp> (* 4 5)
-20
-
-elisp> (print "Hello, Lisp!")
-Hello, Lisp!
-"Hello, Lisp!"
-
-elisp> '(1 2 3)
-LIST(null)
-
-elisp> (+ (* 2 3) (- 10 4))
-12
+; ❌ BAD: Will cause runtime error
+(cons 'key 'value)    ; Second arg is scalar
+(cons 'item 42)       ; Second arg is number
+(cons 'a "string")    ; Second arg is string
 ```
 
-## Features
-
-### Supported Data Types
-
-- **Numbers**: Integers and floating-point numbers
-  ```lisp
-  42
-  3.14159
-  -17
-  ```
-
-- **Strings**: Text literals with escape sequence support
-  ```lisp
-  "Hello, World!"
-  "Line 1\nLine 2"
-  "Quote: \"Hello\""
-  ```
-
-- **Symbols**: Identifiers and operators
-  ```lisp
-  foo
-  my-variable
-  +
-  custom-function
-  ```
-
-- **Lists**: S-expressions (parenthesized expressions)
-  ```lisp
-  (+ 1 2)
-  (list 1 2 3)
-  (nested (list (here)))
-  ```
-
-- **Quotes**: Prevent evaluation
-  ```lisp
-  '(1 2 3)
-  'symbol
-  ```
-
-- **Booleans**: True and false values
-  ```lisp
-  #t
-  #f
-  ```
-
-### Built-in Functions
-
-- **Arithmetic**: `+`, `-`, `*`, `/`
-- **I/O**: `print`
-
-### Special Forms
-
-The interpreter recognizes these special forms (with syntax validation):
-- `if`, `cond` - Conditional expressions
-- `let` - Local variable binding
-- `lambda` - Function definition
-- `define`, `defun` - Variable and function definition
-- `quote` - Prevent evaluation
-- `and`, `or`, `not` - Logical operations
-- `defrule`, `fact`, `query` - Rule-based programming constructs
-
-## Architecture
-
-The interpreter follows a classic three-phase design:
-
-```
-Source Code → Tokenizer → Parser → Evaluator → Result
-                ↓           ↓         ↓
-              Tokens      AST    Environment
-```
-
-### Core Components
-
-1. **[`src/tokenizer.js`](src/tokenizer.js)** - Lexical analysis and token generation
-2. **[`src/parser.js`](src/parser.js)** - Syntax analysis and AST construction
-3. **[`src/evaluator.js`](src/evaluator.js)** - Expression evaluation and execution
-4. **[`src/environment.js`](src/environment.js)** - Variable scope and binding management
-5. **[`src/repl.js`](src/repl.js)** - Interactive Read-Eval-Print Loop
-
-## Documentation
-
-- **[Architecture Guide](docs/ARCHITECTURE.md)** - Detailed system design and component interaction
-- **[User Guide](docs/USER_GUIDE.md)** - Complete Lisp language reference and usage
-- **[API Reference](docs/API_REFERENCE.md)** - Comprehensive module and function documentation
-- **[Developer Guide](docs/DEVELOPER_GUIDE.md)** - Contributing guidelines and extension points
-- **[Examples](docs/EXAMPLES.md)** - Code samples and tutorials
-
-## Project Structure
-
-```
-lispOS-e/
-├── index.js              # Main entry point (REPL)
-├── src/
-│   ├── tokenizer.js      # Lexical analysis
-│   ├── parser.js         # Syntax analysis
-│   ├── evaluator.js      # Expression evaluation
-│   ├── environment.js    # Scope management
-│   ├── repl.js          # Interactive interface
-│   ├── file-runner.js    # File execution engine
-│   └── lisp/             # Lisp source files
-│       └── initial-test.lisp # Comprehensive test script
-├── tests/                # Test suite
-│   ├── tokenizer.test.js # Tokenizer tests
-│   ├── parser.test.js    # Parser tests
-│   ├── evaluator.test.js # Evaluator tests
-│   ├── integration.test.js # Integration tests
-│   └── run-all-tests.js  # Test runner
-├── docs/                 # Documentation
-└── README.md            # This file
-```
-
-## Testing
-
-The project includes a comprehensive test suite with 87 tests covering all major components:
-
-### Running Tests
+#### Migration Tools
 
 ```bash
-# Run all tests
-node tests/run-all-tests.js
+# Check for cons misuse
+node tools/lint-cons.js
 
-# Run individual test suites
-node tests/tokenizer.test.js
-node tests/parser.test.js
-node tests/evaluator.test.js
-node tests/integration.test.js
+# Preview fixes (dry run)
+node tools/codemod-cons.js --dry-run
+
+# Apply fixes automatically
+node tools/codemod-cons.js
+
+# Run cons safety tests
+node tests/cons_misuse_tests.lisp
 ```
 
-### Test Coverage
+### Lambda Arity Rule
 
-- **Tokenizer Tests (13 tests)**: Lexical analysis, token generation, error handling
-- **Parser Tests (24 tests)**: Syntax analysis, AST construction, special form validation
-- **Evaluator Tests (27 tests)**: Expression evaluation, built-in functions, error cases
-- **Integration Tests (23 tests)**: Complete pipeline testing, real-world scenarios
+**⚠️ IMPORTANT**: Our Etherney eLISP interpreter enforces strict lambda arity. Lambda expressions must have exactly 2 arguments: `(lambda <params> <single-body-expr>)`.
 
-### Test Results
+#### Safe Patterns
+
+```lisp
+; ✅ GOOD: Single body expression
+(lambda (x) (+ x 1))
+(lambda (x y) (* x y))
+
+; ✅ GOOD: Multiple statements wrapped in begin
+(lambda (x y)
+  (begin
+    (define temp (+ x y))
+    (define result (* temp 2))
+    result))
+
+; ✅ GOOD: Explicit define form (preferred)
+(define my-func (lambda (args) body))
+```
+
+#### Unsafe Patterns
+
+```lisp
+; ❌ BAD: Multiple body expressions without begin
+(lambda (x y)
+  (define temp (+ x y))
+  (define result (* temp 2))
+  result)
+
+; ❌ BAD: Define sugar syntax (gets expanded)
+(define (my-func args) body1 body2)
+```
+
+#### Migration Tools
+
+```bash
+# Check for lambda arity violations
+node tools/lint-lambda.js
+
+# Preview fixes (dry run)
+node tools/codemod-lambda.js --dry-run
+
+# Apply fixes automatically
+node tools/codemod-lambda.js
+
+# Run lambda arity tests
+node tests/lambda_arity_tests.lisp
+```
+
+### Usage Examples
+
+```bash
+# Create a new pack
+./tools/scaffold.sh PH labor-law/employment-contracts
+
+# Validate specific pack
+node tools/validate.js packs/legal/PH/civil-law/succession
+
+# Lint all .ether files
+node tools/lint-ether.js packs/legal
+
+# Build all packs
+node tools/build-packs.js
+
+# Run tests for specific pack
+node tools/run-golden.js packs/legal/PH/criminal-law/tests/golden/criminal-basic.json
+```
+
+## 🌐 Interfaces
+
+### Browser Demo (`webapp/`)
+
+A client-side interface for testing knowledge packs:
+
+```bash
+npm run webapp
+# Visit http://localhost:8080
+```
+
+Features:
+- Load predefined or custom knowledge packs
+- Interactive program evaluation
+- Real-time results with trace visualization
+- No server dependencies
+
+### Server Interface (`server/`)
+
+A server-side rendered interface with enhanced features:
+
+```bash
+npm run server
+# Visit http://localhost:3000
+```
+
+Features:
+- Knowledge pack auto-discovery
+- File upload support
+- Deterministic run hashing
+- Production-ready security headers
+
+## 📋 Knowledge Pack Structure
+
+Each knowledge pack contains:
 
 ```
-🧪 Etherney Lisp Machine - Test Suite
-=====================================
-Total Tests: 87
-✅ Passed: 87
-❌ Failed: 0
-📈 Success Rate: 100.0%
-🎉 ALL TESTS PASSED! 🎉
+pack-name/
+├── manifest.json         # Pack metadata and configuration
+├── README.md            # Documentation and coverage checklist
+├── main.ether           # Primary rule definitions
+├── CHANGELOG.md         # Version history
+├── facts.example.ether  # Optional example facts
+└── tests/
+    ├── golden/          # Integration test cases
+    └── unit/            # Unit test cases
 ```
 
-### Continuous Testing
+### Manifest Schema
 
-The test suite validates:
-- ✅ **Tokenization**: All Lisp data types and syntax elements
-- ✅ **Parsing**: AST generation and special form validation
-- ✅ **Evaluation**: Arithmetic operations and built-in functions
-- ✅ **Error Handling**: Comprehensive error reporting and recovery
-- ✅ **Integration**: Complete interpreter pipeline functionality
+```json
+{
+  "id": "legal.ph.civil-law.succession",
+  "version": "0.1.0",
+  "jurisdiction": "PH",
+  "field": "civil-law/succession",
+  "description": "Stub rules for PH succession law",
+  "sources": [{"title": "TODO", "citation": "", "url": ""}],
+  "maintainers": [{"name": "TODO", "email": "", "role": "domain-owner"}],
+  "review": {"lastReviewed": "2025-08-15", "status": "draft"},
+  "engine": {"minVersion": "2.0.0", "features": ["defrule", "typed-vars"]},
+  "integrity": {"hash": "", "algo": "sha256"}
+}
+```
 
-## Error Handling
+## 🔒 Security & Compliance
 
-The interpreter provides comprehensive error reporting:
+### Non-Normative Content
 
-- **Tokenizer Errors**: Invalid characters, unterminated strings, malformed numbers
-- **Parser Errors**: Unbalanced parentheses, invalid syntax, malformed special forms
-- **Runtime Errors**: Undefined variables, type errors, function call errors
+**⚠️ IMPORTANT**: All knowledge packs contain only structural stubs and placeholders. No actual statutory text, case law, or normative legal content is included. All rules are generic examples for testing the knowledge representation system only.
 
-All errors include source location information (line and column numbers) for easy debugging.
+### Rule Metadata Requirements
 
-## Troubleshooting
+Every rule must include metadata headers:
 
-### Common Issues
+```lisp
+; sources: TODO
+; owner: TODO
+; last-reviewed: 2025-08-15
+; jurisdiction: PH
+; notes: Generic stub rule description
+(defrule example-rule :priority 50 :cf 0.8
+  (and (condition ?x) (constraint ?x ?y))
+  (conclusion ?x ?y))
+```
 
-#### Installation Issues
+## 🧪 Testing
 
-**Problem**: `node: command not found`
-**Solution**: Install Node.js from [nodejs.org](https://nodejs.org/) (version 12 or higher required)
+### Golden Tests
 
-**Problem**: Permission errors when running
-**Solution**: Ensure you have read/write permissions in the project directory
+Integration tests that verify end-to-end behavior:
 
-#### Runtime Issues
+```json
+{
+  "name": "basic-succession-test",
+  "pack": "packs/legal/PH/civil-law/succession",
+  "facts": [{"form": "(heir spouse)"}],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}
+```
 
-**Problem**: REPL doesn't start
-**Solution**:
-1. Check that you're in the correct directory
-2. Verify `index.js` exists
-3. Run `node --version` to confirm Node.js is installed
+### Unit Tests
 
-**Problem**: Syntax errors not showing line numbers
-**Solution**: This is expected behavior - the interpreter provides basic error reporting
+Rule-level tests using the `deftest` macro:
 
-**Problem**: Large expressions cause stack overflow
-**Solution**: Break down complex nested expressions into smaller parts
+```lisp
+(deftest test-heir-identification
+  "Test basic heir identification rule"
+  (given (person alice) (deceased bob))
+  (expect (potential-heir alice bob spouse)))
+```
 
-#### Language Issues
+## 🔄 CI/CD Pipeline
 
-**Problem**: Variables don't persist between REPL sessions
-**Solution**: Variable definition (`define`) is not yet implemented in the evaluator
+GitHub Actions workflow (`.github/workflows/ci.yml`):
 
-**Problem**: Special forms like `if`, `let` don't work
-**Solution**: These are recognized by the parser but not yet implemented in the evaluator
+1. **Validate** - Check pack structure and metadata
+2. **Lint** - Verify .ether file compliance
+3. **Build** - Package knowledge packs
+4. **Test** - Execute golden test suites
+5. **Report** - Generate and upload artifacts
 
-**Problem**: Lists always display as `LIST(null)`
-**Solution**: This is the current AST representation - actual list processing will be added in future versions
+## 📖 Contributing
 
-### Performance Issues
+### Guidelines
 
-**Problem**: Slow parsing of large expressions
-**Solution**:
-1. Break expressions into smaller parts
-2. Use simpler nested structures
-3. Consider the current implementation is educational/prototype level
+1. **No Normative Content**: Never include actual legal text without proper sources
+2. **Metadata Required**: All rules must have complete metadata headers
+3. **Test Coverage**: Include both golden and unit tests
+4. **Documentation**: Update README and coverage checklists
 
-**Problem**: Memory usage grows over time
-**Solution**: Restart the REPL periodically for long sessions
+### Adding New Packs
 
-### Getting Help
+```bash
+# Use the scaffolding tool
+./tools/scaffold.sh JURISDICTION field/subfield [pack-name]
 
-1. **Check the documentation**:
-   - [User Guide](docs/USER_GUIDE.md) - Language features and syntax
-   - [API Reference](docs/API_REFERENCE.md) - Technical details
-   - [Examples](docs/EXAMPLES.md) - Code samples
+# Example: Create US constitutional law pack
+./tools/scaffold.sh US constitutional-law
+```
 
-2. **Common error patterns**:
-   - Unbalanced parentheses: Count your `(` and `)`
-   - Unterminated strings: Check for closing `"`
-   - Invalid characters: Stick to supported Lisp syntax
+### Code of Conduct
 
-3. **Debug your code**:
-   - Test expressions incrementally
-   - Use `print` to trace execution
-   - Start with simple expressions and build complexity
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
 
-## FAQ
+## 📄 License
 
-### General Questions
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
 
-**Q: What version of Lisp does this implement?**
-A: This is a custom Lisp implementation with basic features. It's designed for educational purposes and follows traditional Lisp syntax.
+## 🤝 Support
 
-**Q: Can I use this for production applications?**
-A: This is currently a prototype/educational implementation. For production use, consider mature Lisp implementations like SBCL, Clojure, or Racket.
+- **Issues**: Report bugs and request features via GitHub Issues
+- **Documentation**: Comprehensive guides available in `docs/`
+- **Community**: Join discussions in GitHub Discussions
 
-**Q: How complete is the implementation?**
-A: Current features include:
-- ✅ Tokenization and parsing
-- ✅ Basic arithmetic operations
-- ✅ String and number literals
-- ✅ List structures and quotes
-- ✅ Interactive REPL
-- ❌ Variable definition and scoping
-- ❌ Function definition and application
-- ❌ Control flow (if, cond, loops)
-- ❌ Advanced data structures
+## 🗺️ Roadmap
 
-### Technical Questions
+- [ ] Additional jurisdictions (US, EU, UK, etc.)
+- [ ] Enhanced rule conflict detection
+- [ ] Integration with external legal databases
+- [ ] Advanced reasoning capabilities
+- [ ] Multi-language support
 
-**Q: Why do lists show as `LIST(null)` instead of actual content?**
-A: The current implementation returns AST nodes rather than evaluated list structures. This will be improved in future versions.
+---
 
-**Q: Can I add new built-in functions?**
-A: Yes! See the [Developer Guide](docs/DEVELOPER_GUIDE.md) for instructions on extending the interpreter.
-
-**Q: How do I contribute new features?**
-A: Check the [Developer Guide](docs/DEVELOPER_GUIDE.md) for contribution guidelines and architecture details.
-
-**Q: Is there a standard library?**
-A: Currently only basic arithmetic and print functions are available. A standard library is planned for future development.
-
-**Q: Can I save and load Lisp programs?**
-A: Yes! You can create `.lisp` files and execute them using the file runner: `node src/file-runner.js your-file.lisp`
-
-### Syntax Questions
-
-**Q: What's the difference between `(+ 1 2)` and `'(+ 1 2)`?**
-A: `(+ 1 2)` evaluates the expression and returns `3`. `'(+ 1 2)` quotes the expression and returns the list structure without evaluation.
-
-**Q: Why can't I define variables?**
-A: Variable definition syntax is recognized by the parser but not yet implemented in the evaluator. This is planned for future development.
-
-**Q: What escape sequences are supported in strings?**
-A: Supported escape sequences: `\n` (newline), `\t` (tab), `\r` (carriage return), `\\` (backslash), `\"` (quote), `\'` (single quote).
-
-**Q: Can I use Unicode characters?**
-A: Basic Unicode support is available in strings, but symbol names should stick to ASCII characters for best compatibility.
-
-## Contributing
-
-We welcome contributions! Please see the [Developer Guide](docs/DEVELOPER_GUIDE.md) for:
-
-- Code style guidelines
-- Architecture overview
-- Extension points
-- Testing procedures
-- Submission process
-
-## License
-
-[Add your license information here]
-
-## Acknowledgments
-
-This project implements a Lisp interpreter following traditional design patterns and best practices in programming language implementation.
+**Disclaimer**: This is a knowledge representation system for legal reasoning research and development. It is not intended to provide legal advice or replace qualified legal counsel.

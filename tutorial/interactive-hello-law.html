@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hello Law - Interactive Legal Coding Tutorial</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            background: white;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        button {
+            background: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        .result {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .valid {
+            border-left-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .invalid {
+            border-left-color: #e74c3c;
+            background: #fdf2f2;
+        }
+        
+        .warning {
+            border-left-color: #f39c12;
+            background: #fef9e7;
+        }
+        
+        .code-example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #34495e;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+        
+        .tab {
+            background: #34495e;
+            color: white;
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s;
+        }
+        
+        .tab.active {
+            background: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .progress {
+            background: #ecf0f1;
+            height: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            background: #3498db;
+            height: 100%;
+            width: 20%;
+            transition: width 0.5s;
+        }
+        
+        .step-indicator {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #bdc3c7;
+            color: white;
+            text-align: center;
+            line-height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .step-indicator.completed {
+            background: #27ae60;
+        }
+        
+        .step-indicator.current {
+            background: #3498db;
+        }
+        
+        .calculator-content {
+            display: none;
+        }
+        
+        .calculator-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏛️ Hello Law - Interactive Legal Coding Tutorial</h1>
+        <p>Learn legal programming by doing - no coding experience required!</p>
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('welcome')">Welcome</button>
+        <button class="tab" onclick="showTab('contract-checker')">Contract Checker</button>
+        <button class="tab" onclick="showTab('legal-advice')">Legal Advice</button>
+        <button class="tab" onclick="showTab('calculator')">Legal Calculator</button>
+        <button class="tab" onclick="showTab('learn-code')">Learn the Code</button>
+    </div>
+
+    <!-- Welcome Tab -->
+    <div id="welcome" class="tab-content active">
+        <div class="section">
+            <h2><span class="step-indicator current">1</span>Welcome to Legal Programming!</h2>
+            <p>This interactive tutorial will teach you how legal rules can be translated into code. You'll use real legal tools and see how programming can make legal work more efficient and accurate.</p>
+            
+            <div class="input-group">
+                <label for="lawyerName">Enter your name to get started:</label>
+                <input type="text" id="lawyerName" placeholder="Attorney Smith" onchange="updateGreeting()">
+            </div>
+            
+            <div id="personalGreeting" class="result" style="display: none;">
+                <h3>🎉 Welcome to Legal Programming!</h3>
+                <p id="greetingText"></p>
+            </div>
+            
+            <h3>What You'll Learn Today:</h3>
+            <ul>
+                <li>✅ How to check if contracts are legally valid</li>
+                <li>✅ How to get automated legal advice</li>
+                <li>✅ How to calculate legal fees and deadlines</li>
+                <li>✅ How legal rules become computer code</li>
+            </ul>
+            
+            <button onclick="showTab('contract-checker')">Start Learning →</button>
+        </div>
+    </div>
+
+    <!-- Contract Checker Tab -->
+    <div id="contract-checker" class="tab-content">
+        <div class="section">
+            <h2><span class="step-indicator">2</span>Interactive Contract Validity Checker</h2>
+            <p><strong>Legal Basis:</strong> Article 1318, Civil Code of the Philippines</p>
+            <p><em>"There is no contract unless the following requisites concur: (1) Consent of the contracting parties; (2) Object certain which is the subject matter of the contract; (3) Cause of the obligation which is established."</em></p>
+            
+            <h3>Check Your Contract:</h3>
+            
+            <div class="input-group">
+                <label for="contractType">What type of contract is this?</label>
+                <select id="contractType">
+                    <option value="sale">Sale of Property</option>
+                    <option value="service">Service Agreement</option>
+                    <option value="employment">Employment Contract</option>
+                    <option value="lease">Lease Agreement</option>
+                    <option value="loan">Loan Agreement</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="hasConsent"> 
+                    <strong>Consent:</strong> Do all parties freely agree to the contract terms?
+                </label>
+                <small>Consider: No duress, fraud, mistake, or incapacity</small>
+            </div>
+            
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="hasObject"> 
+                    <strong>Object:</strong> Is the subject matter of the contract clearly defined?
+                </label>
+                <small>Consider: Specific property, services, or obligations described</small>
+            </div>
+            
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="hasCause"> 
+                    <strong>Cause:</strong> Is there valid consideration or legal reason for the contract?
+                </label>
+                <small>Consider: Payment, exchange of value, or legal obligation</small>
+            </div>
+            
+            <button onclick="checkContract()">Analyze Contract Validity</button>
+            
+            <div id="contractResult" class="result" style="display: none;">
+                <h3 id="contractStatus"></h3>
+                <div id="contractAnalysis"></div>
+                <div id="contractAdvice"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legal Advice Tab -->
+    <div id="legal-advice" class="tab-content">
+        <div class="section">
+            <h2><span class="step-indicator">3</span>Interactive Legal Advice System</h2>
+            <p>Get instant legal guidance based on your situation. This demonstrates how legal decision trees can be automated.</p>
+            
+            <div class="input-group">
+                <label for="legalSituation">What's your legal situation?</label>
+                <select id="legalSituation" onchange="updateAdviceForm()">
+                    <option value="">Select a situation...</option>
+                    <option value="contract-dispute">Contract Dispute</option>
+                    <option value="employment-issue">Employment Issue</option>
+                    <option value="property-matter">Property Matter</option>
+                    <option value="family-law">Family Law Issue</option>
+                    <option value="business-formation">Business Formation</option>
+                    <option value="compliance">Regulatory Compliance</option>
+                </select>
+            </div>
+            
+            <div id="adviceDetails" style="display: none;">
+                <div class="input-group">
+                    <label for="situationDetails">Describe your specific situation:</label>
+                    <textarea id="situationDetails" rows="3" placeholder="Provide relevant details..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="urgency">How urgent is this matter?</label>
+                    <select id="urgency">
+                        <option value="low">Not urgent - planning ahead</option>
+                        <option value="medium">Moderately urgent - within weeks</option>
+                        <option value="high">Very urgent - immediate attention needed</option>
+                    </select>
+                </div>
+                
+                <button onclick="getLegalAdvice()">Get Legal Advice</button>
+            </div>
+            
+            <div id="adviceResult" class="result" style="display: none;">
+                <h3>📋 Legal Advice</h3>
+                <div id="adviceContent"></div>
+                <div id="nextSteps"></div>
+                <div id="warningNote" class="warning">
+                    <strong>⚠️ Important:</strong> This is general guidance only. Consult with a qualified attorney for specific legal advice tailored to your situation.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legal Calculator Tab -->
+    <div id="calculator" class="tab-content">
+        <div class="section">
+            <h2><span class="step-indicator">4</span>Interactive Legal Calculators</h2>
+            <p>See how legal calculations can be automated with precision and consistency.</p>
+            
+            <div style="margin-bottom: 20px;">
+                <button class="tab" onclick="showCalculator('age')" id="ageTab">Age Verification</button>
+                <button class="tab" onclick="showCalculator('fees')" id="feesTab">Legal Fees</button>
+                <button class="tab" onclick="showCalculator('deadlines')" id="deadlinesTab">Deadlines</button>
+            </div>
+            
+            <!-- Age Calculator -->
+            <div id="age-calc" class="calculator-content">
+                <h3>Legal Age Verification</h3>
+                <div class="input-group">
+                    <label for="birthDate">Enter birth date:</label>
+                    <input type="date" id="birthDate" onchange="calculateAge()">
+                </div>
+                
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" id="hasGuardian"> 
+                        If minor: Does the person have guardian consent?
+                    </label>
+                </div>
+                
+                <button onclick="calculateAge()">Check Legal Status</button>
+                
+                <div id="ageResult" class="result" style="display: none;">
+                    <h4 id="ageStatus"></h4>
+                    <div id="ageAnalysis"></div>
+                    <div id="ageAdvice"></div>
+                </div>
+            </div>
+            
+            <!-- Fees Calculator -->
+            <div id="fees-calc" class="calculator-content">
+                <h3>Legal Fees Calculator</h3>
+                <div class="input-group">
+                    <label for="hourlyRate">Hourly Rate (₱):</label>
+                    <input type="number" id="hourlyRate" value="2000" min="0" step="100">
+                </div>
+                
+                <div class="input-group">
+                    <label for="hoursWorked">Hours Worked:</label>
+                    <input type="number" id="hoursWorked" value="10" min="0" step="0.5">
+                </div>
+                
+                <div class="input-group">
+                    <label for="expenses">Additional Expenses (₱):</label>
+                    <input type="number" id="expenses" value="0" min="0" step="100">
+                </div>
+                
+                <button onclick="calculateFees()">Calculate Total Fees</button>
+                
+                <div id="feesResult" class="result" style="display: none;">
+                    <h4>Fee Calculation</h4>
+                    <div id="feesBreakdown"></div>
+                </div>
+            </div>
+            
+            <!-- Deadlines Calculator -->
+            <div id="deadlines-calc" class="calculator-content">
+                <h3>Legal Deadlines Calculator</h3>
+                <div class="input-group">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate" onchange="calculateDeadlines()">
+                </div>
+                
+                <div class="input-group">
+                    <label for="actionType">Type of Legal Action:</label>
+                    <select id="actionType" onchange="calculateDeadlines()">
+                        <option value="appeal">Appeal (15 days)</option>
+                        <option value="answer">Answer to Complaint (30 days)</option>
+                        <option value="motion">Motion for Reconsideration (15 days)</option>
+                        <option value="contract">Contract Claims (10 years)</option>
+                        <option value="tort">Tort Claims (4 years)</option>
+                    </select>
+                </div>
+                
+                <button onclick="calculateDeadlines()">Calculate Deadlines</button>
+                
+                <div id="deadlinesResult" class="result" style="display: none;">
+                    <h4>Important Deadlines</h4>
+                    <div id="deadlinesContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learn Code Tab -->
+    <div id="learn-code" class="tab-content">
+        <div class="section">
+            <h2><span class="step-indicator">5</span>See the Code Behind the Magic</h2>
+            <p>Here's how the legal rules you just used are translated into code. This is what makes legal programming so powerful!</p>
+            
+            <h3>Contract Validity Checker Code:</h3>
+            <div class="code-example">
+function checkContractValidity(hasConsent, hasObject, hasCause) {
+    // Legal basis: Article 1318, Civil Code of the Philippines
+    
+    // All three elements must be present for a valid contract
+    const isValid = hasConsent && hasObject && hasCause;
+    
+    // Identify missing elements
+    const missingElements = [];
+    if (!hasConsent) missingElements.push('Consent');
+    if (!hasObject) missingElements.push('Object');
+    if (!hasCause) missingElements.push('Cause');
+    
+    return {
+        valid: isValid,
+        status: isValid ? 'VALID CONTRACT' : 'INVALID CONTRACT',
+        missingElements: missingElements,
+        legalEffect: isValid ? 
+            'Contract is enforceable' : 
+            'No contract exists - remedy missing elements'
+    };
+}
+            </div>
+            
+            <h3>Legal Age Verification Code:</h3>
+            <div class="code-example">
+function checkLegalAge(birthDate, hasGuardianConsent) {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    const age = Math.floor((today - birth) / (365.25 * 24 * 60 * 60 * 1000));
+    
+    // Legal rule: Age of majority is 18 years
+    if (age >= 18) {
+        return {
+            status: 'ADULT',
+            canContract: true,
+            message: 'Can enter contracts independently'
+        };
+    } else if (hasGuardianConsent) {
+        return {
+            status: 'MINOR WITH CONSENT',
+            canContract: true,
+            message: 'Can enter limited contracts with guardian approval'
+        };
+    } else {
+        return {
+            status: 'MINOR WITHOUT CONSENT',
+            canContract: false,
+            message: 'Cannot enter contracts'
+        };
+    }
+}
+            </div>
+            
+            <h3>What This Means for Lawyers:</h3>
+            <ul>
+                <li><strong>Consistency:</strong> Legal rules are applied exactly the same way every time</li>
+                <li><strong>Speed:</strong> Instant analysis instead of manual research</li>
+                <li><strong>Accuracy:</strong> Reduces human error in complex legal calculations</li>
+                <li><strong>Scalability:</strong> Handle hundreds of cases with the same logic</li>
+                <li><strong>Documentation:</strong> Code serves as precise legal rule documentation</li>
+            </ul>
+            
+            <div class="result valid">
+                <h3>🎉 Congratulations!</h3>
+                <p>You've successfully completed the Hello Law interactive tutorial! You now understand how legal rules can be translated into code and how this can revolutionize legal practice.</p>
+                
+                <h4>What You've Learned:</h4>
+                <ul>
+                    <li>✅ How to use interactive legal tools</li>
+                    <li>✅ How legal rules become programming logic</li>
+                    <li>✅ How to automate legal analysis and calculations</li>
+                    <li>✅ The power of legal programming for consistency and efficiency</li>
+                </ul>
+                
+                <h4>Next Steps:</h4>
+                <ul>
+                    <li>Try the advanced contract validity tutorial</li>
+                    <li>Explore family law calculators</li>
+                    <li>Learn to build your own legal tools</li>
+                    <li>Join the legal programming community</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tabs .tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Update step indicators
+            updateStepIndicators(tabName);
+        }
+
+        function updateStepIndicators(tabName) {
+            const stepMap = {
+                'welcome': 1,
+                'contract-checker': 2,
+                'legal-advice': 3,
+                'calculator': 4,
+                'learn-code': 5
+            };
+            
+            currentStep = stepMap[tabName] || 1;
+            updateProgress();
+            
+            // Update step indicator classes
+            const indicators = document.querySelectorAll('.step-indicator');
+            indicators.forEach((indicator, index) => {
+                indicator.classList.remove('completed', 'current');
+                if (index + 1 < currentStep) {
+                    indicator.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    indicator.classList.add('current');
+                }
+            });
+        }
+
+        function updateGreeting() {
+            const name = document.getElementById('lawyerName').value;
+            if (name.trim()) {
+                const greeting = document.getElementById('personalGreeting');
+                const text = document.getElementById('greetingText');
+                text.innerHTML = `Hello, ${name}! Welcome to the exciting world of legal programming. You're about to discover how technology can transform legal practice by making it more efficient, accurate, and innovative.`;
+                greeting.style.display = 'block';
+            }
+        }
+
+        function checkContract() {
+            const contractType = document.getElementById('contractType').value;
+            const hasConsent = document.getElementById('hasConsent').checked;
+            const hasObject = document.getElementById('hasObject').checked;
+            const hasCause = document.getElementById('hasCause').checked;
+            
+            const isValid = hasConsent && hasObject && hasCause;
+            const missingElements = [];
+            
+            if (!hasConsent) missingElements.push('Consent');
+            if (!hasObject) missingElements.push('Object');
+            if (!hasCause) missingElements.push('Cause');
+            
+            const result = document.getElementById('contractResult');
+            const status = document.getElementById('contractStatus');
+            const analysis = document.getElementById('contractAnalysis');
+            const advice = document.getElementById('contractAdvice');
+            
+            result.className = isValid ? 'result valid' : 'result invalid';
+            status.textContent = isValid ? '✅ VALID CONTRACT' : '❌ INVALID CONTRACT';
+            
+            if (isValid) {
+                analysis.innerHTML = `
+                    <p><strong>Analysis:</strong> This ${contractType} contract meets all requirements of Article 1318:</p>
+                    <ul>
+                        <li>✅ Consent: All parties freely agree</li>
+                        <li>✅ Object: Subject matter is clearly defined</li>
+                        <li>✅ Cause: Valid consideration exists</li>
+                    </ul>
+                `;
+                advice.innerHTML = `
+                    <p><strong>Legal Effect:</strong> This contract is legally enforceable. All parties are bound by their obligations.</p>
+                    <p><strong>Next Steps:</strong> Ensure proper execution, consider registration if required, and maintain records.</p>
+                `;
+            } else {
+                analysis.innerHTML = `
+                    <p><strong>Analysis:</strong> This contract is invalid under Article 1318. Missing elements:</p>
+                    <ul>
+                        ${missingElements.map(element => `<li>❌ ${element}</li>`).join('')}
+                    </ul>
+                `;
+                advice.innerHTML = `
+                    <p><strong>Legal Effect:</strong> No valid contract exists. The agreement is unenforceable.</p>
+                    <p><strong>Next Steps:</strong> Address missing elements: ${missingElements.join(', ')}. Consider renegotiation or reformation.</p>
+                `;
+            }
+            
+            result.style.display = 'block';
+        }
+
+        function updateAdviceForm() {
+            const situation = document.getElementById('legalSituation').value;
+            const details = document.getElementById('adviceDetails');
+            
+            if (situation) {
+                details.style.display = 'block';
+            } else {
+                details.style.display = 'none';
+            }
+        }
+
+        function getLegalAdvice() {
+            const situation = document.getElementById('legalSituation').value;
+            const details = document.getElementById('situationDetails').value;
+            const urgency = document.getElementById('urgency').value;
+            
+            const adviceMap = {
+                'contract-dispute': {
+                    advice: 'Document all communications and contract terms. Review the contract for breach conditions. Consider mediation before litigation.',
+                    steps: ['Gather all contract documents', 'Document the dispute details', 'Attempt good faith negotiation', 'Consider alternative dispute resolution', 'Consult with a contracts attorney']
+                },
+                'employment-issue': {
+                    advice: 'Review employment contract and company policies. Document all incidents. Know your rights under labor laws.',
+                    steps: ['Review employment agreement', 'Document incidents with dates/times', 'Check company handbook policies', 'File complaints with appropriate agencies if needed', 'Consult with employment attorney']
+                },
+                'property-matter': {
+                    advice: 'Verify property titles and ownership. Check zoning laws and restrictions. Ensure all transfers are properly documented.',
+                    steps: ['Conduct title search', 'Review property surveys', 'Check zoning compliance', 'Verify tax payments', 'Consult with real estate attorney']
+                },
+                'family-law': {
+                    advice: 'Prioritize children\'s welfare. Document financial information. Consider mediation for amicable resolution.',
+                    steps: ['Gather financial documents', 'Document custody arrangements', 'Consider mediation services', 'Understand your legal rights', 'Consult with family law attorney']
+                },
+                'business-formation': {
+                    advice: 'Choose appropriate business structure. Comply with registration requirements. Understand tax implications.',
+                    steps: ['Determine business structure', 'Register with appropriate agencies', 'Obtain necessary licenses', 'Set up business banking', 'Consult with business attorney']
+                },
+                'compliance': {
+                    advice: 'Identify applicable regulations. Create compliance checklist. Implement monitoring systems.',
+                    steps: ['Identify relevant laws/regulations', 'Create compliance procedures', 'Train staff on requirements', 'Implement monitoring systems', 'Consult with regulatory attorney']
+                }
+            };
+            
+            const advice = adviceMap[situation];
+            const result = document.getElementById('adviceResult');
+            const content = document.getElementById('adviceContent');
+            const steps = document.getElementById('nextSteps');
+            
+            if (advice) {
+                content.innerHTML = `
+                    <p><strong>Situation:</strong> ${situation.replace('-', ' ').toUpperCase()}</p>
+                    <p><strong>Urgency Level:</strong> ${urgency.toUpperCase()}</p>
+                    <p><strong>General Advice:</strong> ${advice.advice}</p>
+                `;
+                
+                steps.innerHTML = `
+                    <p><strong>Recommended Next Steps:</strong></p>
+                    <ol>
+                        ${advice.steps.map(step => `<li>${step}</li>`).join('')}
+                    </ol>
+                `;
+                
+                result.style.display = 'block';
+            }
+        }
+
+        function showCalculator(calcType) {
+            // Hide all calculator contents
+            const calcs = document.querySelectorAll('.calculator-content');
+            calcs.forEach(calc => calc.classList.remove('active'));
+            
+            // Remove active class from calculator tabs
+            const calcTabs = document.querySelectorAll('#calculator button');
+            calcTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected calculator
+            document.getElementById(calcType + '-calc').classList.add('active');
+            document.getElementById(calcType + 'Tab').classList.add('active');
+        }
+
+        function calculateAge() {
+            const birthDate = document.getElementById('birthDate').value;
+            const hasGuardian = document.getElementById('hasGuardian').checked;
+            
+            if (!birthDate) return;
+            
+            const today = new Date();
+            const birth = new Date(birthDate);
+            const age = Math.floor((today - birth) / (365.25 * 24 * 60 * 60 * 1000));
+            
+            const result = document.getElementById('ageResult');
+            const status = document.getElementById('ageStatus');
+            const analysis = document.getElementById('ageAnalysis');
+            const advice = document.getElementById('ageAdvice');
+            
+            if (age >= 18) {
+                result.className = 'result valid';
+                status.textContent = '✅ ADULT (Age: ' + age + ')';
+                analysis.innerHTML = '<p><strong>Legal Status:</strong> Full legal capacity - can enter contracts independently.</p>';
+                advice.innerHTML = '<p><strong>Contract Rights:</strong> Can enter into all types of contracts without restrictions.</p>';
+            } else if (hasGuardian) {
+                result.className = 'result warning';
+                status.textContent = '⚠️ MINOR WITH CONSENT (Age: ' + age + ')';
+                analysis.innerHTML = '<p><strong>Legal Status:</strong> Limited capacity - can enter certain contracts with guardian approval.</p>';
+                advice.innerHTML = '<p><strong>Contract Rights:</strong> Can enter limited contracts with proper guardian consent and approval.</p>';
+            } else {
+                result.className = 'result invalid';
+                status.textContent = '❌ MINOR WITHOUT CONSENT (Age: ' + age + ')';
+                analysis.innerHTML = '<p><strong>Legal Status:</strong> No contractual capacity - cannot enter binding contracts.</p>';
+                advice.innerHTML = '<p><strong>Contract Rights:</strong> Cannot enter contracts. Guardian consent required for any legal agreements.</p>';
+            }
+            
+            result.style.display = 'block';
+        }
+
+        function calculateFees() {
+            const rate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const hours = parseFloat(document.getElementById('hoursWorked').value) || 0;
+            const expenses = parseFloat(document.getElementById('expenses').value) || 0;
+            
+            const professionalFees = rate * hours;
+            const total = professionalFees + expenses;
+            
+            const result = document.getElementById('feesResult');
+            const breakdown = document.getElementById('feesBreakdown');
+            
+            breakdown.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td><strong>Professional Fees:</strong></td>
+                        <td style="text-align: right;">₱${rate.toLocaleString()} × ${hours} hours = ₱${professionalFees.toLocaleString()}</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td><strong>Expenses:</strong></td>
+                        <td style="text-align: right;">₱${expenses.toLocaleString()}</td>
+                    </tr>
+                    <tr style="border-top: 2px solid #333; font-weight: bold;">
+                        <td><strong>Total Amount Due:</strong></td>
+                        <td style="text-align: right;">₱${total.toLocaleString()}</td>
+                    </tr>
+                </table>
+            `;
+            
+            result.style.display = 'block';
+        }
+
+        function calculateDeadlines() {
+            const startDate = document.getElementById('startDate').value;
+            const actionType = document.getElementById('actionType').value;
+            
+            if (!startDate) return;
+            
+            const start = new Date(startDate);
+            const deadlineMap = {
+                'appeal': { days: 15, name: 'Appeal' },
+                'answer': { days: 30, name: 'Answer to Complaint' },
+                'motion': { days: 15, name: 'Motion for Reconsideration' },
+                'contract': { days: 3650, name: 'Contract Claims' }, // 10 years
+                'tort': { days: 1460, name: 'Tort Claims' } // 4 years
+            };
+            
+            const deadline = deadlineMap[actionType];
+            const dueDate = new Date(start);
+            dueDate.setDate(dueDate.getDate() + deadline.days);
+            
+            const today = new Date();
+            const daysRemaining = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+            
+            const result = document.getElementById('deadlinesResult');
+            const content = document.getElementById('deadlinesContent');
+            
+            const isUrgent = daysRemaining <= 7;
+            const isExpired = daysRemaining < 0;
+            
+            result.className = isExpired ? 'result invalid' : (isUrgent ? 'result warning' : 'result valid');
+            
+            content.innerHTML = `
+                <p><strong>Action Type:</strong> ${deadline.name}</p>
+                <p><strong>Start Date:</strong> ${start.toLocaleDateString()}</p>
+                <p><strong>Deadline:</strong> ${dueDate.toLocaleDateString()}</p>
+                <p><strong>Status:</strong> ${
+                    isExpired ? '❌ EXPIRED' :
+                    isUrgent ? '⚠️ URGENT' :
+                    '✅ ON TIME'
+                }</p>
+                <p><strong>Days ${isExpired ? 'Overdue' : 'Remaining'}:</strong> ${Math.abs(daysRemaining)} days</p>
+                ${isUrgent && !isExpired ? '<p><strong>⚠️ Warning:</strong> Deadline is approaching soon!</p>' : ''}
+                ${isExpired ? '<p><strong>❌ Action Required:</strong> Deadline has passed. Consider filing for extension or other remedies.</p>' : ''}
+            `;
+            
+            result.style.display = 'block';
+        }
+
+        // Initialize the first calculator tab
+        document.addEventListener('DOMContentLoaded', function() {
+            showCalculator('age');
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

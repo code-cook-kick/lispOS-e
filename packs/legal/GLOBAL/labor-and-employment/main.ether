@@ -1,0 +1,14 @@
+(defrule
+  example-rule
+  :priority
+  100
+  :cf
+  0.8
+  (and
+  (example-predicate ?x:symbol)
+  (example-condition ?x ?y:symbol))
+  (example-conclusion ?x ?y))
+
+(defpred example-predicate (symbol))
+
+(defpred example-condition (symbol symbol))

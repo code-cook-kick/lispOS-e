@@ -1,0 +1,90 @@
+(defrule
+  validate-treaty
+  :priority
+  100
+  :cf
+  0.9
+  (and
+  (treaty ?treaty:symbol)
+  (state-consent ?state:symbol ?treaty)
+  (treaty-capacity ?state)
+  (proper-ratification ?treaty ?state))
+  (valid-treaty-obligation ?state ?treaty))
+
+(defrule
+  apply-diplomatic-immunity
+  :priority
+  95
+  :cf
+  0.9
+  (and
+  (diplomatic-agent ?person:symbol)
+  (accredited-to ?person ?state:symbol)
+  (official-capacity ?person))
+  (immune-from-jurisdiction ?person ?state))
+
+(defrule
+  assess-state-responsibility
+  :priority
+  90
+  :cf
+  0.8
+  (and
+  (state-act ?state:symbol ?act:symbol)
+  (internationally-wrongful ?act)
+  (attributable-to ?act ?state))
+  (state-responsibility ?state ?act))
+
+(defrule
+  evaluate-use-of-force
+  :priority
+  85
+  :cf
+  0.8
+  (and
+  (military-action ?state:symbol ?action:symbol)
+  (self-defense ?action ?justified:boolean)
+  (un-authorization ?action ?authorized:boolean))
+  (lawful-force ?state ?action ?justified ?authorized))
+
+(defrule
+  resolve-international-dispute
+  :priority
+  80
+  :cf
+  0.7
+  (and
+  (international-dispute ?dispute:symbol)
+  (parties ?dispute ?states:list)
+  (dispute-mechanism ?mechanism:symbol))
+  (dispute-resolution ?dispute ?states ?mechanism))
+
+(defrule
+  apply-human-rights-obligations
+  :priority
+  75
+  :cf
+  0.8
+  (and
+  (human-rights-treaty ?treaty:symbol)
+  (state-party ?state:symbol ?treaty)
+  (rights-violation ?violation:symbol))
+  (treaty-obligation ?state ?treaty ?violation))
+
+(defrule
+  determine-maritime-boundary
+  :priority
+  70
+  :cf
+  0.6
+  (and
+  (coastal-states ?state1:symbol ?state2:symbol)
+  (maritime-zone ?zone:symbol)
+  (delimitation-method ?method:symbol))
+  (maritime-boundary ?state1 ?state2 ?zone ?method))
+
+(defpred treaty (symbol))
+
+(defpred state-consent (symbol symbol))
+
+(defpred treaty-capacity (symbol))

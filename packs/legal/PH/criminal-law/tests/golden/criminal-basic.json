@@ -1,0 +1,12 @@
+{
+  "name": "basic-criminal-liability",
+  "pack": "packs/legal/PH/criminal-law",
+  "facts": [
+    { "form": "(criminal-act theft)" },
+    { "form": "(mental-state john intentional)" },
+    { "form": "(causation john theft)" },
+    { "form": "(gravity theft light)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

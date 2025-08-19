@@ -1,27 +1,53 @@
 {
-  "name": "lispos-e",
+  "name": "etherney-lisp-legal-knowledgepacks",
   "version": "1.0.0",
-  "description": "A complete Lisp interpreter implementation in JavaScript with comprehensive tokenization, parsing, and evaluation capabilities.",
-  "homepage": "https://github.com/code-cook-kick/lispOS-e#readme",
-  "bugs": {
-    "url": "https://github.com/code-cook-kick/lispOS-e/issues"
+  "description": "Complete monorepo for Etherney-LISP Legal Knowledge Packs with comprehensive legal domain coverage",
+  "main": "index.js",
+  "scripts": {
+    "validate": "node tools/validate.js",
+    "lint": "node tools/lint-ether.js",
+    "build": "node tools/build-packs.js",
+    "test": "node tools/run-golden.js",
+    "scaffold": "bash tools/scaffold.sh",
+    "test-lambda": "node test-lambda-cli.js",
+    "test-comprehensive": "node -e \"const { evalProgramFromString, createGlobalEnv } = require('./src/evaluator.js'); const fs = require('fs'); const env = createGlobalEnv(); const testCode = fs.readFileSync('tests/comprehensive-test-suite.lisp', 'utf8'); try { const result = evalProgramFromString(testCode, env); console.log('\\nComprehensive Test Result:', result === true ? 'PASSED' : 'FAILED'); process.exit(result === true ? 0 : 1); } catch (error) { console.log('ERROR:', error.message); process.exit(1); }\"",
+    "estate-calculator": "node family-estate-calculator.js",
+    "demo-calculator": "node demo-estate-calculator.js",
+    "legal-examples": "node src/evaluator.js examples/legal-coding-examples.lisp",
+    "legal-exercises": "node src/evaluator.js examples/lawyer-exercises.lisp",
+    "extending-demo": "node src/evaluator.js examples/extending-system-demo.lisp",
+    "tutorial": "node src/evaluator.js tutorial/contract-validity-tutorial.lisp",
+    "lambda-lint": "node tools/lint-lambda.js",
+    "lambda-fix": "node tools/codemod-lambda.js",
+    "ci": "npm run validate && npm run lint && npm run lambda-lint && npm run build && npm run test && npm run test-lambda && npm run test-comprehensive",
+    "clean": "rm -rf dist reports node_modules",
+    "setup": "npm install",
+    "docs": "echo 'Documentation available in docs/ directory'"
   },
+  "keywords": [
+    "lisp",
+    "legal",
+    "knowledge-packs",
+    "symbolic-reasoning",
+    "legal-tech",
+    "rule-engine",
+    "philippines",
+    "international-law"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/code-cook-kick/lispOS-e.git"
+    "url": "https://github.com/example/etherney-lisp-legal-knowledgepacks.git"
   },
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs",
-    "test": "tests"
+  "bugs": {
+    "url": "https://github.com/example/etherney-lisp-legal-knowledgepacks/issues"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "homepage": "https://github.com/example/etherney-lisp-legal-knowledgepacks#readme",
+  "engines": {
+    "node": ">=18.0.0"
   },
-  "dependencies": {
-    "fs": "^0.0.1-security"
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

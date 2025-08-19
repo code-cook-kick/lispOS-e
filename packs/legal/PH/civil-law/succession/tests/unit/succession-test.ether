@@ -1,0 +1,15 @@
+(deftest
+  test-heir-identification
+  "Test basic heir identification rule"
+  (given
+  (person alice)
+  (person bob)
+  (deceased bob)
+  (relationship alice bob spouse))
+  (expect (potential-heir alice bob spouse)))
+
+(deftest
+  test-surviving-spouse-inheritance
+  "Test surviving spouse inheritance in intestate succession"
+  (given (surviving-spouse mary john) (no-will john))
+  (expect (intestate-heir mary john spouse)))

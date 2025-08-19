@@ -1,0 +1,10 @@
+{
+  "name": "basic-banking-finance-securities-test",
+  "pack": "packs/legal/GLOBAL/banking-finance-securities",
+  "facts": [
+    { "form": "(example-predicate test-item)" },
+    { "form": "(example-condition test-item test-value)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

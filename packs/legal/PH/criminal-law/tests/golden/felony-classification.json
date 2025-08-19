@@ -1,0 +1,92 @@
+{
+  "testName": "Criminal Law - Felony Classification",
+  "description": "Test felony classification rules based on penalty types",
+  "pack": "legal.ph.criminal-law",
+  "version": "0.1.0",
+  "jurisdiction": "PH",
+  "testType": "golden",
+  "disclaimer": "Non-normative test case for engine structure validation only",
+  "facts": [
+    {
+      "predicate": "crime",
+      "args": ["murder"]
+    },
+    {
+      "predicate": "crime",
+      "args": ["theft"]
+    },
+    {
+      "predicate": "crime",
+      "args": ["slight-physical-injuries"]
+    },
+    {
+      "predicate": "penalty",
+      "args": ["murder", "reclusion-perpetua"]
+    },
+    {
+      "predicate": "penalty",
+      "args": ["theft", "prision-mayor"]
+    },
+    {
+      "predicate": "penalty",
+      "args": ["slight-physical-injuries", "arresto-menor"]
+    },
+    {
+      "predicate": "penalty-type",
+      "args": ["reclusion-perpetua", "grave"]
+    },
+    {
+      "predicate": "penalty-type",
+      "args": ["prision-mayor", "less-grave"]
+    },
+    {
+      "predicate": "penalty-type",
+      "args": ["arresto-menor", "light"]
+    }
+  ],
+  "expectedInferences": [
+    {
+      "predicate": "grave-felony",
+      "args": ["murder"],
+      "confidence": "TODO"
+    },
+    {
+      "predicate": "less-grave-felony",
+      "args": ["theft"],
+      "confidence": "TODO"
+    },
+    {
+      "predicate": "light-felony",
+      "args": ["slight-physical-injuries"],
+      "confidence": "TODO"
+    }
+  ],
+  "expectedConclusions": [
+    {
+      "description": "Murder should be classified as grave felony",
+      "expected": "TODO - Requires legal expert validation"
+    },
+    {
+      "description": "Theft should be classified as less grave felony",
+      "expected": "TODO - Requires legal expert validation"
+    },
+    {
+      "description": "Slight physical injuries should be classified as light felony",
+      "expected": "TODO - Requires legal expert validation"
+    }
+  ],
+  "notes": [
+    "This test validates felony classification based on penalty types",
+    "Actual legal determinations require expert validation",
+    "Test focuses on engine structure, not normative outcomes"
+  ],
+  "sources": [
+    {
+      "title": "TODO - Revised Penal Code Article 9",
+      "citation": "RPC Article 9",
+      "relevance": "Primary authority for felony classification"
+    }
+  ],
+  "lastUpdated": "2025-08-15",
+  "status": "draft"
+}

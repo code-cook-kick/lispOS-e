@@ -1,12 +1,82 @@
-const Environment = require("./environment");
+const { Environment, gensym } = require("./environment");
 const { hostLoadFileSync } = require("./host/fs_bridge");
 const { LispParser } = require("./parser");
+
+// Resource limits for safe execution
+const DEFAULT_MAX_STEPS = 100000;
+const DEFAULT_MAX_MACRO_EXPANSIONS = 1000;
+
+// ResourceError class for limit violations
+class ResourceError extends Error {
+    constructor(message, phase) {
+        super(message);
+        this.name = 'ResourceError';
+        this.phase = phase;
+    }
+}
+
+// Global execution context for resource tracking
+let executionContext = {
+    stepCount: 0,
+    macroExpansionCount: 0,
+    maxSteps: DEFAULT_MAX_STEPS,
+    maxMacroExpansions: DEFAULT_MAX_MACRO_EXPANSIONS,
+    trampolineActive: false
+};
+
+// Reset execution context for new evaluation
+function resetExecutionContext(maxSteps = DEFAULT_MAX_STEPS, maxMacroExpansions = DEFAULT_MAX_MACRO_EXPANSIONS) {
+    executionContext = {
+        stepCount: 0,
+        macroExpansionCount: 0,
+        maxSteps,
+        maxMacroExpansions,
+        trampolineActive: false
+    };
+}
+
+// Check step budget and increment counter
+function checkStepBudget() {
+    if (++executionContext.stepCount > executionContext.maxSteps) {
+        throw new ResourceError(`Execution step limit exceeded (${executionContext.maxSteps})`, 'evaluation');
+    }
+}
+
+// Check macro expansion budget and increment counter
+function checkMacroExpansionBudget() {
+    if (++executionContext.macroExpansionCount > executionContext.maxMacroExpansions) {
+        throw new ResourceError(`Macro expansion limit exceeded (${executionContext.maxMacroExpansions})`, 'macro-expansion');
+    }
+}
+
+// Trampoline data structure for tail call optimization
+function createTailCall(fn, args) {
+    return { type: 'tail-call', fn, args };
+}
+
+function isTailCall(value) {
+    return value && typeof value === 'object' && value.type === 'tail-call';
+}
+
+// Trampoline executor - handles tail calls without stack growth
+function trampoline(initialFn, initialArgs) {
+    let result = initialFn(...initialArgs);
+    
+    while (isTailCall(result)) {
+        result = result.fn(...result.args);
+    }
+    
+    return result;
+}
 
 function isList(node) {
     return node.type === "LIST";
 }
 
 function evalNode(node, env) {
+    // Check step budget on each evaluation step
+    checkStepBudget();
+    
     switch (node.type) {
         case "NUMBER":
             return Number(node.value);
@@ -98,12 +168,15 @@ let expansionDepth = 0;
 const MAX_EXPANSION_DEPTH = 200;
 
 /**
- * Safely call a macro transformer with depth protection
+ * Safely call a macro transformer with depth and budget protection
  */
 function callTransformer(transformer, rawArgs) {
+    // Check macro expansion budget
+    checkMacroExpansionBudget();
+    
     if (++expansionDepth > MAX_EXPANSION_DEPTH) {
         expansionDepth--;
-        throw new Error("Macro expansion depth exceeded");
+        throw new ResourceError("Macro expansion depth exceeded", 'macro-expansion');
     }
     try {
         // transformer is a JS function that takes rawArgs array and returns AST
@@ -176,6 +249,8 @@ function evalList(list, env) {
                 return evalOr(rest, env);
             case "let":
                 return evalLet(rest, env);
+            case "begin":
+                return evalBegin(rest, env);
         }
         
         // Macro expansion ONLY if head is a SYMBOL that names a macro
@@ -242,6 +317,11 @@ function evalLambda(args, env) {
         const newEnv = new Environment(env);
         for (let i = 0; i < paramNames.length; i++) {
             newEnv.define(paramNames[i], args[i]);
+        }
+        
+        // Use trampoline for tail call optimization if active
+        if (executionContext.trampolineActive) {
+            return createTailCall(evalNode, [bodyNode, newEnv]);
         }
         
         return evalNode(bodyNode, newEnv);
@@ -419,25 +499,57 @@ function evalLet(args, env) {
     return evalNode(bodyNode, letEnv);
 }
 
+/**
+ * Evaluate begin special form for sequential execution
+ * Syntax: (begin expr1 expr2 ... exprN)
+ * Evaluates all expressions in order and returns the value of the last one
+ */
+function evalBegin(args, env) {
+    if (args.length === 0) {
+        return null; // Empty begin returns nil
+    }
+    
+    let result = null;
+    for (const expr of args) {
+        result = evalNode(expr, env);
+    }
+    
+    return result;
+}
+
 function evalListForm(args, env) {
     return args.map(arg => evalNode(arg, env));
 }
 
 /**
- * Parse and evaluate a string containing LISP source code
+ * Parse and evaluate a string containing LISP source code with resource limits
  *
  * @param {string} src - LISP source code as string
  * @param {Environment} env - Environment to evaluate in
+ * @param {Object} options - Execution options {maxSteps, maxMacroExpansions, useTrampoline}
  * @returns {*} Value of the last top-level form, or null if empty
  */
-function evalProgramFromString(src, env) {
+function evalProgramFromString(src, env, options = {}) {
     try {
+        // Reset execution context with provided limits
+        resetExecutionContext(
+            options.maxSteps || DEFAULT_MAX_STEPS,
+            options.maxMacroExpansions || DEFAULT_MAX_MACRO_EXPANSIONS
+        );
+        
+        // Enable trampoline if requested
+        executionContext.trampolineActive = options.useTrampoline || false;
+        
         const parser = new LispParser(src);
         const program = parser.parse(); // returns array of AST nodes (top-level forms)
         
         let lastResult = null;
         for (const form of program) {
-            lastResult = evalNode(form, env);
+            if (executionContext.trampolineActive) {
+                lastResult = trampoline(evalNode, [form, env]);
+            } else {
+                lastResult = evalNode(form, env);
+            }
         }
         
         return lastResult;
@@ -445,7 +557,8 @@ function evalProgramFromString(src, env) {
         // Return error object instead of throwing to allow graceful handling
         return {
             type: "error",
-            message: `evalProgramFromString: ${error.message || error}`
+            message: `evalProgramFromString: ${error.message || error}`,
+            phase: error.phase || 'evaluation'
         };
     }
 }
@@ -593,6 +706,11 @@ function createGlobalEnv() {
         return args[args.length - 1];
     });
 
+    // Gensym for macro hygiene
+    env.define("gensym", (prefix) => {
+        return gensym(prefix);
+    });
+
     // File system bridge - host primitive for reading files
     env.define("host-load-file", (path) => {
         try {
@@ -629,4 +747,13 @@ function createGlobalEnv() {
     return env;
 }
 
-module.exports = { evalNode, createGlobalEnv, evalProgramFromString };
+module.exports = {
+    evalNode,
+    createGlobalEnv,
+    evalProgramFromString,
+    ResourceError,
+    resetExecutionContext,
+    trampoline,
+    DEFAULT_MAX_STEPS,
+    DEFAULT_MAX_MACRO_EXPANSIONS
+};

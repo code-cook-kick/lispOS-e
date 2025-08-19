@@ -1,0 +1,17 @@
+(deftest
+  test-felony-classification
+  "Test basic felony classification rule"
+  (given
+  (criminal-act robbery)
+  (gravity robbery serious)
+  (penalty-range serious 6 12))
+  (expect (felony-classification robbery serious)))
+
+(deftest
+  test-criminal-liability-assessment
+  "Test criminal liability assessment"
+  (given
+  (criminal-act murder)
+  (mental-state defendant intentional)
+  (causation defendant murder))
+  (expect (criminal-liability defendant murder intentional)))

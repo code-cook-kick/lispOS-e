@@ -1,0 +1,84 @@
+{
+  "testName": "Constitutional Law - Basic Rights Analysis",
+  "description": "Test fundamental rights protection and due process analysis",
+  "pack": "legal.ph.constitutional-law",
+  "version": "0.1.0",
+  "jurisdiction": "PH",
+  "testType": "golden",
+  "disclaimer": "Non-normative test case for engine structure validation only",
+  "facts": [
+    {
+      "predicate": "person",
+      "args": ["citizen-a"]
+    },
+    {
+      "predicate": "government-action",
+      "args": ["law-x"]
+    },
+    {
+      "predicate": "affects",
+      "args": ["law-x", "citizen-a"]
+    },
+    {
+      "predicate": "fundamental-right",
+      "args": ["freedom-of-speech"]
+    },
+    {
+      "predicate": "expression",
+      "args": ["political-speech"]
+    },
+    {
+      "predicate": "government-classification",
+      "args": ["discriminatory-law", "suspect-class"]
+    },
+    {
+      "predicate": "suspect-classification",
+      "args": ["suspect-class"]
+    }
+  ],
+  "expectedInferences": [
+    {
+      "predicate": "due-process-required",
+      "args": ["law-x", "citizen-a", "freedom-of-speech"],
+      "confidence": "TODO"
+    },
+    {
+      "predicate": "protected-speech",
+      "args": ["citizen-a", "political-speech"],
+      "confidence": "TODO"
+    },
+    {
+      "predicate": "constitutional-violation",
+      "args": ["discriminatory-law", "equal-protection"],
+      "confidence": "TODO"
+    }
+  ],
+  "expectedConclusions": [
+    {
+      "description": "Due process should be required for government actions affecting fundamental rights",
+      "expected": "TODO - Requires constitutional law expert validation"
+    },
+    {
+      "description": "Political speech should receive constitutional protection",
+      "expected": "TODO - Requires constitutional law expert validation"
+    },
+    {
+      "description": "Laws creating suspect classifications should trigger strict scrutiny",
+      "expected": "TODO - Requires constitutional law expert validation"
+    }
+  ],
+  "notes": [
+    "This test validates basic constitutional rights analysis",
+    "Actual constitutional determinations require expert validation",
+    "Test focuses on engine structure, not normative outcomes"
+  ],
+  "sources": [
+    {
+      "title": "TODO - 1987 Constitution Article III (Bill of Rights)",
+      "citation": "1987 Constitution Article III",
+      "relevance": "Primary authority for fundamental rights"
+    }
+  ],
+  "lastUpdated": "2025-08-15",
+  "status": "draft"
+}

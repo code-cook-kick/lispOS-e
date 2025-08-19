@@ -1,3 +1,48 @@
+// Global gensym counter for unique symbol generation
+let gensymCounter = 0;
+
+/**
+ * Generate unique symbol for macro hygiene
+ * @param {string} prefix - Optional prefix for the generated symbol
+ * @returns {string} Unique symbol name
+ */
+function gensym(prefix = 'G') {
+    return `${prefix}__${++gensymCounter}`;
+}
+
+/**
+ * Hygienic binding helper for macros
+ * Creates a new environment with hygienic bindings to prevent variable capture
+ * @param {Environment} env - Base environment
+ * @param {Array} bindings - Array of [name, value] pairs
+ * @returns {Environment} New environment with hygienic bindings
+ */
+function hygienicBind(env, bindings) {
+    const newEnv = new Environment(env);
+    const renameMap = new Map();
+    
+    // First pass: create unique names for all bindings
+    for (const [name, value] of bindings) {
+        const uniqueName = gensym(name);
+        renameMap.set(name, uniqueName);
+        newEnv.define(uniqueName, value);
+    }
+    
+    // Store rename map for potential use in macro expansion
+    newEnv._hygienicRenames = renameMap;
+    
+    return newEnv;
+}
+
+/**
+ * Check if a symbol name is a generated gensym
+ * @param {string} name - Symbol name to check
+ * @returns {boolean} True if name appears to be a gensym
+ */
+function isGensym(name) {
+    return typeof name === 'string' && /__\d+$/.test(name);
+}
+
 class Environment {
     constructor(parent = null) {
         this.vars = new Map();
@@ -20,6 +65,9 @@ class Environment {
         this.lookupMacro = function(name) {
             return this.macros.get(name);
         };
+        
+        // Hygienic rename tracking for macro expansion
+        this._hygienicRenames = null;
     }
 
     define(name, value) {
@@ -45,4 +93,9 @@ class Environment {
     }
 }
 
-module.exports = Environment;
+module.exports = {
+    Environment,
+    gensym,
+    hygienicBind,
+    isGensym
+};

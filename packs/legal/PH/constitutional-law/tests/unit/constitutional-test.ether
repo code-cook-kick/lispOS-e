@@ -1,0 +1,22 @@
+(deftest
+  test-due-process-analysis
+  "Test basic due process analysis rule"
+  (given
+  (government-action deportation)
+  (affects-rights deportation alien-x)
+  (procedural-safeguards deportation (notice hearing counsel)))
+  (expect
+  (due-process-analysis
+  deportation
+  alien-x
+  (notice hearing counsel))))
+
+(deftest
+  test-separation-powers-check
+  "Test separation of powers validation"
+  (given
+  (government-branch congress legislative)
+  (power-exercise congress judicial-review)
+  (constitutional-authority legislative judicial-review false))
+  (expect
+  (separation-powers-check congress judicial-review false)))

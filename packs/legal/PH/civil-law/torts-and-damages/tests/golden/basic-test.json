@@ -1,0 +1,10 @@
+{
+  "name": "basic-torts-and-damages-test",
+  "pack": "packs/legal/PH/civil-law/torts-and-damages",
+  "facts": [
+    { "form": "(example-predicate test-item)" },
+    { "form": "(example-condition test-item test-value)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

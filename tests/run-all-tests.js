@@ -7,6 +7,8 @@ const TokenizerTests = require('./tokenizer.test.js');
 const ParserTests = require('./parser.test.js');
 const EvaluatorTests = require('./evaluator.test.js');
 const IntegrationTests = require('./integration.test.js');
+const ResourceLimitsTests = require('./resource-limits.test.js');
+const SecurityTests = require('./security.test.js');
 
 function runAllTests() {
     console.log('🧪 Etherney Lisp Machine - Test Suite');
@@ -22,7 +24,9 @@ function runAllTests() {
         { name: 'Tokenizer', runner: TokenizerTests },
         { name: 'Parser', runner: ParserTests },
         { name: 'Evaluator', runner: EvaluatorTests },
-        { name: 'Integration', runner: IntegrationTests }
+        { name: 'Integration', runner: IntegrationTests },
+        { name: 'Resource Limits', runner: ResourceLimitsTests },
+        { name: 'Security', runner: SecurityTests }
     ];
 
     for (const suite of testSuites) {

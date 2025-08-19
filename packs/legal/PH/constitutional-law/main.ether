@@ -1,0 +1,92 @@
+(defrule
+  analyze-due-process
+  :priority
+  100
+  :cf
+  0.9
+  (and
+  (government-action ?action:symbol)
+  (affects-rights ?action ?person:symbol)
+  (procedural-safeguards ?action ?safeguards:list))
+  (due-process-analysis ?action ?person ?safeguards))
+
+(defrule
+  analyze-equal-protection
+  :priority
+  95
+  :cf
+  0.8
+  (and
+  (classification ?law:symbol ?class:symbol)
+  (government-interest ?law ?interest:symbol)
+  (scrutiny-level ?class ?level:symbol))
+  (equal-protection-analysis ?law ?class ?interest ?level))
+
+(defrule
+  analyze-speech-restriction
+  :priority
+  90
+  :cf
+  0.8
+  (and
+  (speech-restriction ?restriction:symbol)
+  (content-based ?restriction ?content:boolean)
+  (compelling-interest ?restriction ?interest:symbol))
+  (speech-analysis ?restriction ?content ?interest))
+
+(defrule
+  check-separation-powers
+  :priority
+  85
+  :cf
+  0.9
+  (and
+  (government-branch ?actor:symbol ?branch:symbol)
+  (power-exercise ?actor ?power:symbol)
+  (constitutional-authority ?branch ?power ?authorized:boolean))
+  (separation-powers-check ?actor ?power ?authorized))
+
+(defrule
+  apply-judicial-review
+  :priority
+  80
+  :cf
+  0.7
+  (and
+  (challenged-law ?law:symbol)
+  (constitutional-provision ?provision:symbol)
+  (conflicts ?law ?provision))
+  (judicial-review-result ?law ?provision unconstitutional))
+
+(defrule
+  assess-emergency-powers
+  :priority
+  75
+  :cf
+  0.6
+  (and
+  (emergency-situation ?situation:symbol)
+  (emergency-declaration ?declaration:symbol)
+  (constitutional-requirements ?requirements:list))
+  (emergency-powers-validity
+  ?declaration
+  ?situation
+  ?requirements))
+
+(defrule
+  evaluate-impeachment-grounds
+  :priority
+  70
+  :cf
+  0.8
+  (and
+  (impeachable-officer ?officer:symbol)
+  (alleged-offense ?offense:symbol)
+  (impeachment-ground ?offense ?ground:symbol))
+  (impeachment-case ?officer ?offense ?ground))
+
+(defpred government-action (symbol))
+
+(defpred affects-rights (symbol symbol))
+
+(defpred procedural-safeguards (symbol list))

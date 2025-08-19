@@ -1,0 +1,10 @@
+{
+  "name": "basic-government-procurement-test",
+  "pack": "packs/legal/GLOBAL/government-procurement",
+  "facts": [
+    { "form": "(example-predicate test-item)" },
+    { "form": "(example-condition test-item test-value)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

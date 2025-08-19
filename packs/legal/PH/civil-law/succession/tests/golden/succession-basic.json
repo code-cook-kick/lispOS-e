@@ -1,0 +1,13 @@
+{
+  "name": "basic-intestate-succession",
+  "pack": "packs/legal/PH/civil-law/succession",
+  "facts": [
+    { "form": "(person john)" },
+    { "form": "(person mary)" },
+    { "form": "(deceased john)" },
+    { "form": "(surviving-spouse mary john)" },
+    { "form": "(no-will john)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "basic-anti-corruption-and-ethics-test",
+  "pack": "packs/legal/PH/anti-corruption-and-ethics",
+  "facts": [
+    { "form": "(example-predicate test-item)" },
+    { "form": "(example-condition test-item test-value)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

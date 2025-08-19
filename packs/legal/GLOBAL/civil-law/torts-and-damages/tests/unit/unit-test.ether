@@ -1,0 +1,7 @@
+(deftest
+  test-example-rule
+  "Test basic example rule"
+  (given
+  (example-predicate sample)
+  (example-condition sample value))
+  (expect (example-conclusion sample value)))

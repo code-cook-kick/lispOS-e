@@ -1,0 +1,18 @@
+(deftest
+  test-treaty-validation
+  "Test basic treaty validation rule"
+  (given
+  (treaty trade-agreement)
+  (state-consent nation-x trade-agreement)
+  (treaty-capacity nation-x)
+  (proper-ratification trade-agreement nation-x))
+  (expect (valid-treaty-obligation nation-x trade-agreement)))
+
+(deftest
+  test-diplomatic-immunity
+  "Test diplomatic immunity application"
+  (given
+  (diplomatic-agent ambassador-y)
+  (accredited-to ambassador-y host-state)
+  (official-capacity ambassador-y))
+  (expect (immune-from-jurisdiction ambassador-y host-state)))

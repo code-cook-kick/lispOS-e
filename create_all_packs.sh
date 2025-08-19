@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# PH Legal Fields (excluding already created ones)
+./tools/scaffold.sh PH civil-law/obligations
+./tools/scaffold.sh PH civil-law/contracts
+./tools/scaffold.sh PH civil-law/property
+./tools/scaffold.sh PH civil-law/family
+./tools/scaffold.sh PH civil-law/torts-and-damages
+./tools/scaffold.sh PH evidence
+./tools/scaffold.sh PH civil-procedure
+./tools/scaffold.sh PH criminal-procedure
+./tools/scaffold.sh PH labor-and-employment
+./tools/scaffold.sh PH tax-law
+./tools/scaffold.sh PH commercial-and-corporate
+./tools/scaffold.sh PH banking-finance-securities
+./tools/scaffold.sh PH intellectual-property
+./tools/scaffold.sh PH environmental-law
+./tools/scaffold.sh PH energy-and-utilities
+./tools/scaffold.sh PH land-and-real-estate
+./tools/scaffold.sh PH data-privacy-and-protection
+./tools/scaffold.sh PH human-rights
+./tools/scaffold.sh PH public-international-law
+./tools/scaffold.sh PH private-international-law
+./tools/scaffold.sh PH maritime-and-admiralty
+./tools/scaffold.sh PH transportation-and-aviation
+./tools/scaffold.sh PH health-law
+./tools/scaffold.sh PH education-law
+./tools/scaffold.sh PH election-law
+./tools/scaffold.sh PH local-government-law
+./tools/scaffold.sh PH government-procurement
+./tools/scaffold.sh PH anti-corruption-and-ethics
+./tools/scaffold.sh PH consumer-protection
+./tools/scaffold.sh PH insurance-law
+./tools/scaffold.sh PH immigration-law
+./tools/scaffold.sh PH telecommunications-and-ict
+./tools/scaffold.sh PH competition-and-antitrust
+./tools/scaffold.sh PH customs-and-trade
+./tools/scaffold.sh PH mining-and-natural-resources
+
+# GLOBAL Legal Fields (excluding already created ones)
+./tools/scaffold.sh GLOBAL constitutional-law
+./tools/scaffold.sh GLOBAL administrative-law
+./tools/scaffold.sh GLOBAL civil-law/obligations
+./tools/scaffold.sh GLOBAL civil-law/contracts
+./tools/scaffold.sh GLOBAL civil-law/property
+./tools/scaffold.sh GLOBAL civil-law/family
+./tools/scaffold.sh GLOBAL civil-law/succession
+./tools/scaffold.sh GLOBAL civil-law/torts-and-damages
+./tools/scaffold.sh GLOBAL criminal-law
+./tools/scaffold.sh GLOBAL evidence
+./tools/scaffold.sh GLOBAL civil-procedure
+./tools/scaffold.sh GLOBAL criminal-procedure
+./tools/scaffold.sh GLOBAL labor-and-employment
+./tools/scaffold.sh GLOBAL tax-law
+./tools/scaffold.sh GLOBAL commercial-and-corporate
+./tools/scaffold.sh GLOBAL banking-finance-securities
+./tools/scaffold.sh GLOBAL intellectual-property
+./tools/scaffold.sh GLOBAL environmental-law
+./tools/scaffold.sh GLOBAL energy-and-utilities
+./tools/scaffold.sh GLOBAL land-and-real-estate
+./tools/scaffold.sh GLOBAL data-privacy-and-protection
+./tools/scaffold.sh GLOBAL human-rights
+./tools/scaffold.sh GLOBAL private-international-law
+./tools/scaffold.sh GLOBAL maritime-and-admiralty
+./tools/scaffold.sh GLOBAL transportation-and-aviation
+./tools/scaffold.sh GLOBAL health-law
+./tools/scaffold.sh GLOBAL education-law
+./tools/scaffold.sh GLOBAL election-law
+./tools/scaffold.sh GLOBAL local-government-law
+./tools/scaffold.sh GLOBAL government-procurement
+./tools/scaffold.sh GLOBAL anti-corruption-and-ethics
+./tools/scaffold.sh GLOBAL consumer-protection
+./tools/scaffold.sh GLOBAL insurance-law
+./tools/scaffold.sh GLOBAL immigration-law
+./tools/scaffold.sh GLOBAL telecommunications-and-ict
+./tools/scaffold.sh GLOBAL competition-and-antitrust
+./tools/scaffold.sh GLOBAL customs-and-trade
+./tools/scaffold.sh GLOBAL mining-and-natural-resources
+
+echo "All legal field packs created successfully!"

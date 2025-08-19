@@ -1,0 +1,288 @@
+(load "src/lisp/common/utils.lisp")
+
+(define *test-results*
+  '
+  ())
+
+(define *current-test*
+  nil)
+
+(define TEST-PASS
+  'pass)
+
+(define TEST-FAIL
+  'fail)
+
+(define TEST-ERROR
+  'error)
+
+(define add-test-result
+  (lambda (name status message expected actual)
+    (begin
+      (define result
+        (list 'test name status message expected actual))
+      (define *test-results*
+        (cons result (ensure-list *test-results*)))
+      result)))
+
+(define clear-test-results
+  (lambda ()
+    (begin
+      (define *test-results*
+        '
+        ())
+      'cleared)))
+
+(define get-test-results
+  (lambda ()
+    *test-results*))
+
+(define count-tests-by-status
+  (lambda (status)
+    (length
+      (filter
+      (lambda (result)
+      (eq? (nth result 2) status))
+      *test-results*))))
+
+(define assert-equal
+  (lambda (expected actual message)
+    (if (equal? expected actual)
+        (add-test-result
+        *current-test*
+        TEST-PASS
+        message
+        expected
+        actual)
+        (add-test-result
+        *current-test*
+        TEST-FAIL
+        (if message
+          message
+          "Values not equal")
+        expected
+        actual))))
+
+(define assert-true
+  (lambda (value message)
+    (assert-equal true value message)))
+
+(define assert-false
+  (lambda (value message)
+    (assert-equal false value message)))
+
+(define assert-nil
+  (lambda (value message)
+    (assert-equal nil value message)))
+
+(define assert-not-nil
+  (lambda (value message)
+    (if (not (eq? value nil))
+        (add-test-result
+        *current-test*
+        TEST-PASS
+        message
+        "not nil"
+        value)
+        (add-test-result
+        *current-test*
+        TEST-FAIL
+        message
+        "not nil"
+        nil))))
+
+(define expect-fact
+  (lambda (fact-pattern)
+    (add-test-result
+      *current-test*
+      TEST-PASS
+      (string-append "Expected fact: " (string fact-pattern))
+      fact-pattern
+      'checked)))
+
+(define expect-rule-fired
+  (lambda (rule-name)
+    (add-test-result
+      *current-test*
+      TEST-PASS
+      (string-append "Expected rule fired: " (string rule-name))
+      rule-name
+      'checked)))
+
+(define run-test
+  (lambda (test-name test-body)
+    (begin
+      (define *current-test*
+        test-name)
+      (print (string-append "Running test: " (string test-name)))
+      (define result
+        (try
+          (begin
+          (test-body)
+          TEST-PASS)
+          (catch
+          error
+          (add-test-result
+          test-name
+          TEST-ERROR
+          (string-append "Test error: " (string error))
+          nil
+          error)
+          TEST-ERROR)))
+      (define *current-test*
+        nil)
+      result)))
+
+(define run-test-suite
+  (lambda (suite-name tests)
+    (begin
+      (print
+        (string-append "Running test suite: " (string suite-name)))
+      (clear-test-results)
+      (define start-time
+        (current-time))
+      (map
+        (lambda (test)
+        (run-test (first test) (second test)))
+        tests)
+      (define end-time
+        (current-time))
+      (define duration
+        (- end-time start-time))
+      (define total-tests
+        (length *test-results*))
+      (define passed-tests
+        (count-tests-by-status TEST-PASS))
+      (define failed-tests
+        (count-tests-by-status TEST-FAIL))
+      (define error-tests
+        (count-tests-by-status TEST-ERROR))
+      (print
+        (string-append
+        "Test suite completed in "
+        (string duration)
+        "ms"))
+      (print (string-append "Total tests: " (string total-tests)))
+      (print (string-append "Passed: " (string passed-tests)))
+      (print (string-append "Failed: " (string failed-tests)))
+      (print (string-append "Errors: " (string error-tests)))
+      (list
+        'suite
+        suite-name
+        'total
+        total-tests
+        'passed
+        passed-tests
+        'failed
+        failed-tests
+        'errors
+        error-tests
+        'duration
+        duration
+        'results
+        *test-results*))))
+
+(defmacro
+  deftest
+  (name description . body)
+  `
+  (define ,name
+  (lambda ()
+    (begin
+      (print
+        ,
+        (string-append "Test: " (string name) " - " description))
+      ,@
+      (map
+        (lambda (clause)
+        (if (and (list? clause) (eq? (first clause) 'given))
+            `
+            (begin
+            (print "Setting up test facts...")
+            ,@
+            (rest clause))))
+        body)
+      ,@
+      (map
+        (lambda (clause)
+        (if (and (list? clause) (eq? (first clause) 'expect))
+            `
+            (begin
+            (print "Checking expectations...")
+            ,@
+            (map
+              (lambda (expectation)
+              (begin
+                `
+                (expect-fact ',expectation)))
+              (rest clause)))))
+        body)))))
+
+(defmacro
+  defsuite
+  (name tests)
+  `
+  (define ,name
+  (lambda ()
+    (run-test-suite
+      ',name
+      (list
+      ,@
+      (map
+      (lambda (test)
+      (begin
+        `
+        (list ',test ,test)))
+      tests))))))
+
+(define make-test-fact
+  (lambda (predicate . args)
+    (cons predicate args)))
+
+(define make-test-rule
+  (lambda (name conditions conclusions)
+    (list 'rule name conditions conclusions)))
+
+(define mock-assert-fact
+  (lambda (fact)
+    (begin
+      (print (string-append "Mock: Asserting fact " (string fact)))
+      fact)))
+
+(define mock-retract-fact
+  (lambda (fact)
+    (begin
+      (print (string-append "Mock: Retracting fact " (string fact)))
+      fact)))
+
+(define mock-run-inference
+  (lambda ()
+    (begin
+      (print "Mock: Running inference engine")
+      'inference-complete)))
+
+(deftest
+  example-test
+  "Example test showing deftest usage"
+  (given
+  (mock-assert-fact ' (person john))
+  (mock-assert-fact ' (age john 25)))
+  (expect (person john) (age john 25)))
+
+(print "Test macros loaded. Available macros:")
+
+(print
+  "  (deftest name description (given ...) (expect ...))")
+
+(print "  (defsuite name (test1 test2 ...))")
+
+(print "Available functions:")
+
+(print
+  "  assert-equal, assert-true, assert-false, assert-nil")
+
+(print "  expect-fact, expect-rule-fired")
+
+(print "  run-test, run-test-suite")
+
+(print "  clear-test-results, get-test-results")

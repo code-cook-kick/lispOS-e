@@ -1,0 +1,10 @@
+{
+  "name": "basic-civil-procedure-test",
+  "pack": "packs/legal/PH/civil-procedure",
+  "facts": [
+    { "form": "(example-predicate test-item)" },
+    { "form": "(example-condition test-item test-value)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

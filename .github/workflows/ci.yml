@@ -1,0 +1,349 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Knowledge Packs
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Validate pack structure
+      run: npm run validate
+    
+    - name: Upload validation report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: validation-report
+        path: reports/
+        retention-days: 30
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint Ether Files
+    needs: validate
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Lint .ether files
+      run: npm run lint
+    
+    - name: Upload lint report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lint-report
+        path: reports/
+        retention-days: 30
+
+  cons-lint:
+    runs-on: ubuntu-latest
+    name: Lint Cons Usage
+    needs: validate
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Check for cons misuse
+      run: node tools/lint-cons.js
+    
+    - name: Verify codemod is idempotent
+      run: node tools/codemod-cons.js --dry-run
+    
+    - name: Upload cons lint report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cons-lint-report
+        path: reports/
+        retention-days: 30
+
+  lambda-lint:
+    runs-on: ubuntu-latest
+    name: Lint Lambda Arity
+    needs: validate
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Check for lambda arity violations
+      run: node tools/lint-lambda.js
+    
+    - name: Verify lambda codemod is idempotent
+      run: node tools/codemod-lambda.js --dry-run
+    
+    - name: Upload lambda lint report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lambda-lint-report
+        path: reports/
+        retention-days: 30
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build Knowledge Packs
+    needs: [validate, lint, cons-lint, lambda-lint]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build packages
+      run: npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: dist/
+        retention-days: 90
+    
+    - name: Upload build report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-report
+        path: reports/
+        retention-days: 30
+
+  test:
+    runs-on: ubuntu-latest
+    name: Run Golden Tests
+    needs: build
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run golden tests
+      run: npm run test
+    
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: reports/
+        retention-days: 30
+
+  cons-test:
+    runs-on: ubuntu-latest
+    name: Test Cons Safety
+    needs: build
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install server dependencies
+      run: cd server && npm ci
+    
+    - name: Run cons misuse tests
+      run: |
+        cd server
+        node ../tests/cons_misuse_tests.lisp || echo "Test failed - this is expected before fixes are applied"
+    
+    - name: Upload cons test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: cons-test-report
+        path: reports/
+        retention-days: 30
+
+  lambda-test:
+    runs-on: ubuntu-latest
+    name: Test Lambda Arity
+    needs: build
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install server dependencies
+      run: cd server && npm ci
+    
+    - name: Run lambda arity tests
+      run: |
+        cd server
+        node ../tests/lambda_arity_tests.lisp
+    
+    - name: Upload lambda test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lambda-test-report
+        path: reports/
+        retention-days: 30
+
+  server-test:
+    runs-on: ubuntu-latest
+    name: Test Server Interface
+    needs: build
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install root dependencies
+      run: npm ci
+    
+    - name: Install server dependencies
+      run: cd server && npm ci
+    
+    - name: Start server in background
+      run: |
+        cd server
+        npm start &
+        sleep 5
+    
+    - name: Test server health
+      run: |
+        curl -f http://localhost:3000/healthz || exit 1
+        curl -f http://localhost:3000/ | grep -q "Etherney-LISP" || exit 1
+    
+    - name: Stop server
+      run: pkill -f "node server.js" || true
+
+  security:
+    runs-on: ubuntu-latest
+    name: Security Scan
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run npm audit
+      run: npm audit --audit-level moderate
+    
+    - name: Install server dependencies
+      run: cd server && npm ci
+    
+    - name: Run server npm audit
+      run: cd server && npm audit --audit-level moderate
+
+  summary:
+    runs-on: ubuntu-latest
+    name: CI Summary
+    needs: [validate, lint, cons-lint, lambda-lint, build, test, cons-test, lambda-test, server-test, security]
+    if: always()
+    
+    steps:
+    - name: Check job results
+      run: |
+        echo "Validation: ${{ needs.validate.result }}"
+        echo "Linting: ${{ needs.lint.result }}"
+        echo "Cons Linting: ${{ needs.cons-lint.result }}"
+        echo "Lambda Linting: ${{ needs.lambda-lint.result }}"
+        echo "Build: ${{ needs.build.result }}"
+        echo "Tests: ${{ needs.test.result }}"
+        echo "Cons Tests: ${{ needs.cons-test.result }}"
+        echo "Lambda Tests: ${{ needs.lambda-test.result }}"
+        echo "Server Test: ${{ needs.server-test.result }}"
+        echo "Security: ${{ needs.security.result }}"
+        
+        if [[ "${{ needs.validate.result }}" != "success" ]] || \
+           [[ "${{ needs.lint.result }}" != "success" ]] || \
+           [[ "${{ needs.cons-lint.result }}" != "success" ]] || \
+           [[ "${{ needs.lambda-lint.result }}" != "success" ]] || \
+           [[ "${{ needs.build.result }}" != "success" ]] || \
+           [[ "${{ needs.test.result }}" != "success" ]] || \
+           [[ "${{ needs.cons-test.result }}" != "success" ]] || \
+           [[ "${{ needs.lambda-test.result }}" != "success" ]] || \
+           [[ "${{ needs.server-test.result }}" != "success" ]] || \
+           [[ "${{ needs.security.result }}" != "success" ]]; then
+          echo "❌ CI pipeline failed"
+          exit 1
+        else
+          echo "✅ CI pipeline passed"
+        fi

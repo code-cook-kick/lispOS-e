@@ -1,0 +1,89 @@
+(defrule
+  classify-felony
+  :priority
+  100
+  :cf
+  0.9
+  (and
+  (criminal-act ?act:symbol)
+  (gravity ?act ?level:symbol)
+  (penalty-range ?level ?min:int ?max:int))
+  (felony-classification ?act ?level))
+
+(defrule
+  assess-criminal-liability
+  :priority
+  95
+  :cf
+  0.8
+  (and
+  (criminal-act ?act:symbol)
+  (mental-state ?actor:symbol ?state:symbol)
+  (causation ?actor ?act))
+  (criminal-liability ?actor ?act ?state))
+
+(defrule
+  apply-justifying-circumstance
+  :priority
+  90
+  :cf
+  0.9
+  (and
+  (criminal-act ?act:symbol)
+  (justifying-circumstance ?circumstance:symbol)
+  (applies-to ?circumstance ?act))
+  (justified ?act ?circumstance))
+
+(defrule
+  apply-mitigating-circumstance
+  :priority
+  80
+  :cf
+  0.7
+  (and
+  (criminal-liability ?actor:symbol ?act:symbol ?state:symbol)
+  (mitigating-factor ?factor:symbol)
+  (present ?factor ?actor))
+  (mitigated-liability ?actor ?act ?factor))
+
+(defrule
+  apply-aggravating-circumstance
+  :priority
+  85
+  :cf
+  0.8
+  (and
+  (criminal-liability ?actor:symbol ?act:symbol ?state:symbol)
+  (aggravating-factor ?factor:symbol)
+  (present ?factor ?act))
+  (aggravated-liability ?actor ?act ?factor))
+
+(defrule
+  compute-penalty
+  :priority
+  70
+  :cf
+  0.6
+  (and
+  (felony-classification ?act:symbol ?level:symbol)
+  (modifying-circumstances ?act ?mods:list))
+  (penalty-range ?act ?level ?mods))
+
+(defrule
+  check-prescription
+  :priority
+  60
+  :cf
+  0.9
+  (and
+  (criminal-act ?act:symbol)
+  (date-committed ?act ?date:symbol)
+  (prescription-period ?act ?period:int)
+  (current-date ?current:symbol))
+  (prescription-status ?act ?date ?current))
+
+(defpred criminal-act (symbol))
+
+(defpred mental-state (symbol symbol))
+
+(defpred causation (symbol symbol))

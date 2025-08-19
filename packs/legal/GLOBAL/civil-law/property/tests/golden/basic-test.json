@@ -1,0 +1,10 @@
+{
+  "name": "basic-property-test",
+  "pack": "packs/legal/GLOBAL/civil-law/property",
+  "facts": [
+    { "form": "(example-predicate test-item)" },
+    { "form": "(example-condition test-item test-value)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

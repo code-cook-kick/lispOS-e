@@ -1,0 +1,87 @@
+(defrule
+  identify-heir
+  :priority
+  100
+  :cf
+  0.8
+  (and
+  (person ?heir:symbol)
+  (deceased ?decedent:symbol)
+  (relationship ?heir ?decedent ?rel:symbol))
+  (potential-heir ?heir ?decedent ?rel))
+
+(defrule
+  surviving-spouse-inheritance
+  :priority
+  90
+  :cf
+  0.9
+  (and
+  (surviving-spouse ?spouse:symbol ?decedent:symbol)
+  (no-will ?decedent))
+  (intestate-heir ?spouse ?decedent spouse))
+
+(defrule
+  legitimate-children-inheritance
+  :priority
+  85
+  :cf
+  0.9
+  (and
+  (legitimate-child ?child:symbol ?decedent:symbol)
+  (no-will ?decedent))
+  (intestate-heir ?child ?decedent legitimate-child))
+
+(defrule
+  calculate-legitime
+  :priority
+  80
+  :cf
+  0.7
+  (and
+  (estate-value ?decedent:symbol ?value:int)
+  (heir-count ?decedent ?count:int))
+  (legitime-portion ?decedent ?value ?count))
+
+(defrule
+  validate-will
+  :priority
+  95
+  :cf
+  0.6
+  (and
+  (will-document ?decedent:symbol ?will:symbol)
+  (proper-execution ?will)
+  (testamentary-capacity ?decedent))
+  (valid-will ?decedent ?will))
+
+(defrule
+  apply-disinheritance
+  :priority
+  75
+  :cf
+  0.8
+  (and
+  (disinheritance-clause
+  ?will:symbol
+  ?heir:symbol
+  ?cause:symbol)
+  (valid-cause ?cause))
+  (disinherited ?heir ?cause))
+
+(defrule
+  collateral-succession
+  :priority
+  60
+  :cf
+  0.5
+  (and
+  (no-direct-heirs ?decedent:symbol)
+  (collateral-relative ?relative:symbol ?decedent ?degree:int))
+  (collateral-heir ?relative ?decedent ?degree))
+
+(defpred person (symbol))
+
+(defpred deceased (symbol))
+
+(defpred relationship (symbol symbol symbol))

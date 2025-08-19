@@ -1,0 +1,12 @@
+{
+  "name": "basic-treaty-validation",
+  "pack": "packs/legal/GLOBAL/public-international-law",
+  "facts": [
+    { "form": "(treaty climate-accord)" },
+    { "form": "(state-consent country-a climate-accord)" },
+    { "form": "(treaty-capacity country-a)" },
+    { "form": "(proper-ratification climate-accord country-a)" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

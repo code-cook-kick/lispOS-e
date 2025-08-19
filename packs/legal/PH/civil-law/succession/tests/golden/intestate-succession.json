@@ -1,0 +1,88 @@
+{
+  "testName": "Intestate Succession - Basic Heir Classification",
+  "description": "Test basic intestate succession rules for heir classification and succession order",
+  "pack": "legal.ph.succession",
+  "version": "0.1.0",
+  "jurisdiction": "PH",
+  "testType": "golden",
+  "disclaimer": "Non-normative test case for engine structure validation only",
+  "facts": [
+    {
+      "predicate": "person",
+      "args": ["juan"]
+    },
+    {
+      "predicate": "person",
+      "args": ["maria"]
+    },
+    {
+      "predicate": "person",
+      "args": ["pedro"]
+    },
+    {
+      "predicate": "deceased",
+      "args": ["juan"]
+    },
+    {
+      "predicate": "relationship",
+      "args": ["maria", "juan", "spouse"]
+    },
+    {
+      "predicate": "relationship",
+      "args": ["pedro", "juan", "child"]
+    },
+    {
+      "predicate": "estate-value",
+      "args": ["juan", 1000000]
+    },
+    {
+      "predicate": "intestate-estate",
+      "args": ["juan"]
+    }
+  ],
+  "expectedInferences": [
+    {
+      "predicate": "compulsory-heir",
+      "args": ["maria", "juan", "spouse"],
+      "confidence": "TODO"
+    },
+    {
+      "predicate": "compulsory-heir",
+      "args": ["pedro", "juan", "child"],
+      "confidence": "TODO"
+    },
+    {
+      "predicate": "succession-order",
+      "args": ["pedro", "juan", "descendant"],
+      "confidence": "TODO"
+    }
+  ],
+  "expectedConclusions": [
+    {
+      "description": "Pedro should be classified as a compulsory heir",
+      "expected": "TODO - Requires legal expert validation"
+    },
+    {
+      "description": "Maria should be classified as surviving spouse",
+      "expected": "TODO - Requires legal expert validation"
+    },
+    {
+      "description": "Succession order should prioritize descendants",
+      "expected": "TODO - Requires legal expert validation"
+    }
+  ],
+  "notes": [
+    "This test validates basic heir classification logic",
+    "Actual legal determinations require expert validation",
+    "Test focuses on engine structure, not normative outcomes"
+  ],
+  "sources": [
+    {
+      "title": "TODO - Civil Code provisions on intestate succession",
+      "citation": "Articles 960-1014",
+      "relevance": "Primary authority for succession rules"
+    }
+  ],
+  "lastUpdated": "2025-08-15",
+  "status": "draft"
+}

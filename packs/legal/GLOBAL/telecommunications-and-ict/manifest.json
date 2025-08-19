@@ -1,0 +1,27 @@
+{
+  "id": "legal.global.telecommunications-and-ict",
+  "version": "0.1.0",
+  "entry": "main.ether",
+  "exports": [],
+  "jurisdiction": "GLOBAL",
+  "field": "telecommunications-and-ict",
+  "description": "Stub rules and structure for GLOBAL telecommunications-and-ict.",
+  "sources": [
+    { "title": "TODO", "citation": "", "url": "" }
+  ],
+  "maintainers": [
+    { "name": "TODO", "email": "", "role": "domain-owner" }
+  ],
+  "review": {
+    "lastReviewed": "2025-08-15",
+    "status": "draft"
+  },
+  "engine": {
+    "minVersion": "2.0.0",
+    "features": ["defrule", "typed-vars", "priority", "cf"]
+  },
+  "integrity": {
+    "hash": "",
+    "algo": "sha256"
+  }
+}

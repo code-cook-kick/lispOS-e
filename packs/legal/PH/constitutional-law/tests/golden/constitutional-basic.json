@@ -1,0 +1,11 @@
+{
+  "name": "basic-due-process-analysis",
+  "pack": "packs/legal/PH/constitutional-law",
+  "facts": [
+    { "form": "(government-action license-revocation)" },
+    { "form": "(affects-rights license-revocation citizen-a)" },
+    { "form": "(procedural-safeguards license-revocation (notice hearing))" }
+  ],
+  "query": "(begin (run))",
+  "expected": "TODO"
+}

@@ -1,110 +1,104 @@
-;;; ===================================================================
-;;; ETHERNEY eLISP LAMBDA-DRIVEN DYNAMIC STATUTES - PRODUCTION HARDENED
-;;; ===================================================================
-;;; Week-4 library: spawnable statutes, predicate combinators, 
-;;; domain predicates, fact producers
-;;; Pure LISP implementation using only safe structural recursion
-;;; PRODUCTION AUDIT: Tail recursion optimized, edge case hardened
+(load "src/lisp/common/utils.lisp")
 
-(print "=== Loading Production-Hardened Lambda Rules System ===")
+(print
+  "=== Loading Production-Hardened Lambda Rules System ===")
 
-;;; -------------------------------------------------------------------
-;;; PART A: SAFE LIST HELPERS - PRODUCTION HARDENED
-;;; -------------------------------------------------------------------
-;;; No length/nth calls - only null?, first, rest, cons, arithmetic, conditionals
-;;; All functions are tail-recursive where possible for stack safety
+(define safe-empty?
+  (lambda (xs)
+    (or (null? xs) (eq? xs ' ()) (eq? xs null))))
 
-;;; Core safety predicates with comprehensive null checking
-(define safe-empty? 
-  (lambda (xs) 
-    (or (null? xs) (eq? xs '()) (eq? xs null))))
-
-(define as-list     
-  (lambda (x) 
-    (cond 
-      ((null? x) '())
-      ((eq? x '()) '())
-      ((eq? x null) '())
+(define as-list
+  (lambda (x)
+    (cond
+      ((null? x) ' ())
+      ((eq? x ' ()) ' ())
+      ((eq? x null) ' ())
       (#t x))))
 
-(define safe-first  
-  (lambda (xs) 
-    (if (safe-empty? xs) null (first xs))))
+(define safe-first
+  (lambda (xs)
+    (if (safe-empty? xs)
+        null
+        (first xs))))
 
-(define safe-rest   
-  (lambda (xs) 
-    (if (safe-empty? xs) '() (rest xs))))
+(define safe-rest
+  (lambda (xs)
+    (if (safe-empty? xs)
+        '
+        ())))
 
-;;; Tail-recursive length with accumulator for stack safety
 (define safe-length
   (lambda (xs)
-    (define length-acc
-      (lambda (lst acc)
-        (if (safe-empty? lst) 
-            acc 
-            (length-acc (rest lst) (+ acc 1)))))
-    (length-acc xs 0)))
+    (begin
+      (define length-acc
+        (lambda (lst acc)
+          (if (safe-empty? lst)
+              acc
+              (length-acc (rest lst) (+ acc 1)))))
+      (length-acc xs 0))))
 
-;;; Tail-recursive map with accumulator (reversed, then reversed back)
 (define safe-map
   (lambda (f xs)
-    (define map-acc
-      (lambda (lst acc)
-        (if (safe-empty? lst)
-            acc
-            (map-acc (rest lst) (cons (f (first lst)) acc)))))
-    (define reverse-list
-      (lambda (lst)
-        (define rev-acc
-          (lambda (l acc)
-            (if (safe-empty? l) acc (rev-acc (rest l) (cons (first l) acc)))))
-        (rev-acc lst '())))
-    (reverse-list (map-acc xs '()))))
+    (begin
+      (define map-acc
+        (lambda (lst acc)
+          (if (safe-empty? lst)
+              acc
+              (map-acc (rest lst) (cons (f (first lst)) acc)))))
+      (define reverse-list
+        (lambda (lst)
+          (begin
+            (define rev-acc
+              (lambda (l acc)
+                (if (safe-empty? l)
+                    acc
+                    (rev-acc (rest l) (cons (first (ensure-list l)) acc)))))
+            (rev-acc lst ' ()))))
+      (reverse-list (map-acc xs ' ())))))
 
-;;; Tail-recursive fold (already tail-recursive)
 (define safe-fold
   (lambda (f acc xs)
-    (if (safe-empty? xs) 
+    (if (safe-empty? xs)
         acc
         (safe-fold f (f acc (first xs)) (rest xs)))))
 
-;;; Additional production helpers for robustness
 (define safe-filter
   (lambda (pred xs)
-    (define filter-acc
-      (lambda (lst acc)
-        (if (safe-empty? lst)
-            acc
-            (let ((item (first lst))
-                  (rest-items (rest lst)))
+    (begin
+      (define filter-acc
+        (lambda (lst acc)
+          (if (safe-empty? lst)
+              acc
+              (let
+              ((item (first lst)) (rest-items (rest lst)))
               (if (pred item)
-                  (filter-acc rest-items (cons item acc))
-                  (filter-acc rest-items acc))))))
-    (define reverse-list
-      (lambda (lst)
-        (define rev-acc
-          (lambda (l acc)
-            (if (safe-empty? l) acc (rev-acc (rest l) (cons (first l) acc)))))
-        (rev-acc lst '())))
-    (reverse-list (filter-acc xs '()))))
+                (filter-acc rest-items (cons item (ensure-list acc)))
+                (filter-acc rest-items acc))))))
+      (define reverse-list
+        (lambda (lst)
+          (begin
+            (define rev-acc
+              (lambda (l acc)
+                (if (safe-empty? l)
+                    acc
+                    (rev-acc (rest l) (cons (first (ensure-list l)) acc)))))
+            (rev-acc lst ' ()))))
+      (reverse-list (filter-acc xs ' ())))))
 
-;;; Safe append for combining lists
 (define safe-append
   (lambda (xs ys)
     (if (safe-empty? xs)
         ys
-        (cons (first xs) (safe-append (rest xs) ys)))))
+        (cons (first (ensure-list xs)) (safe-append (rest xs) ys)))))
 
-;;; Safe contains check
 (define safe-contains?
   (lambda (xs item)
     (if (safe-empty? xs)
         #f
         (if (eq? (first xs) item)
-            #t
-            (safe-contains? (rest xs) item)))))
+          #t
+          (safe-contains? (rest xs) item)))))
 
-;;; Safe nth with bounds checking
 (define safe-nth
   (lambda (n xs)
     (cond
@@ -115,110 +109,105 @@
 
 (print "✓ Production-hardened safe list helpers loaded")
 
-;;; -------------------------------------------------------------------
-;;; PART B: CORE API FOR DYNAMIC STATUTES - PRODUCTION HARDENED
-;;; -------------------------------------------------------------------
-
-;;; B1. Spawn statutes from lambdas with validation
 (define spawn-statute
   (lambda (id title when-l then-l props)
     (cond
       ((null? id) (error "spawn-statute: id cannot be null"))
       ((null? title) (error "spawn-statute: title cannot be null"))
-      ((null? when-l) (error "spawn-statute: when-lambda cannot be null"))
-      ((null? then-l) (error "spawn-statute: then-lambda cannot be null"))
+      ((null? when-l)
+      (error "spawn-statute: when-lambda cannot be null"))
+      ((null? then-l)
+      (error "spawn-statute: then-lambda cannot be null"))
       (#t (statute.make id title when-l then-l (as-list props))))))
 
 (print "✓ Production spawn-statute defined with validation")
 
-;;; B2. Predicate combinators with enhanced error handling
-
-;;; when-all: ALL predicates must be true (short-circuit on false)
 (define when-all
   (lambda preds
     (lambda (ev)
       (if (safe-empty? preds)
-          #t  ; vacuous truth for empty predicate list
-          (define step 
-            (lambda (ps)
-              (cond
-                ((safe-empty? ps) #t)
-                ((not ((first ps) ev)) #f)  ; short-circuit on first false
-                (#t (step (rest ps))))))
-          (step preds)))))
+          #t
+          (define step
+          (lambda (ps)
+            (cond
+              ((safe-empty? ps) #t)
+              ((not ((first ps) ev)) #f)
+              (#t (step (rest ps))))))))))
 
-;;; when-any: ANY predicate must be true (short-circuit on true)
 (define when-any
   (lambda preds
     (lambda (ev)
       (if (safe-empty? preds)
-          #f  ; vacuous false for empty predicate list
-          (define step 
-            (lambda (ps)
-              (cond
-                ((safe-empty? ps) #f)
-                (((first ps) ev) #t)  ; short-circuit on first true
-                (#t (step (rest ps))))))
-          (step preds)))))
+          #f
+          (define step
+          (lambda (ps)
+            (cond
+              ((safe-empty? ps) #f)
+              (((first ps) ev) #t)
+              (#t (step (rest ps))))))))))
 
-;;; when-not: Negation with null safety
 (define when-not
   (lambda (p)
     (if (null? p)
-        (lambda (ev) #t)  ; null predicate is always false, so NOT null is true
-        (lambda (ev) (not (p ev))))))
+        (lambda (ev)
+        #t)
+        (lambda (ev)
+        (not (p ev))))))
 
-;;; when-exactly: Exactly N predicates must be true
 (define when-exactly
   (lambda (n . preds)
     (lambda (ev)
-      (define count-true
-        (lambda (ps acc)
-          (if (safe-empty? ps)
-              acc
-              (count-true (rest ps) 
-                         (if ((first ps) ev) (+ acc 1) acc)))))
-      (= (count-true preds 0) n))))
+      (begin
+        (define count-true
+          (lambda (ps acc)
+            (if (safe-empty? ps)
+                acc
+                (count-true
+                (rest ps)
+                (if ((first ps) ev)
+                  (+ acc 1)
+                  acc)))))
+        (= (count-true preds 0) n)))))
 
-(print "✓ Production predicate combinators defined with short-circuiting")
-
-;;; B3. Domain predicates with comprehensive validation
+(print
+  "✓ Production predicate combinators defined with short-circuiting")
 
 (define p-death
-  (lambda (ev) 
-    (and (not (null? ev))
-         (eq? (event.type ev) 'death))))
+  (lambda (ev)
+    (and (not (null? ev)) (eq? (event.type ev) 'death))))
 
 (define p-no-will
   (lambda (ev)
     (if (null? ev)
         #f
-        (let ((fs (as-list (event.get ev ':flags))))
-          (and (not (safe-empty? fs))
-               (safe-contains? fs 'no-will))))))
+        (let
+        ((fs (as-list (event.get ev ':flags))))
+        (and (not (safe-empty? fs)) (safe-contains? fs 'no-will))))))
 
 (define p-has-will
   (lambda (ev)
     (if (null? ev)
         #f
-        (let ((fs (as-list (event.get ev ':flags))))
-          (and (not (safe-empty? fs))
-               (safe-contains? fs 'has-will))))))
+        (let
+        ((fs (as-list (event.get ev ':flags))))
+        (and (not (safe-empty? fs)) (safe-contains? fs 'has-will))))))
 
 (define p-has-heirs
   (lambda (ev)
     (if (null? ev)
         #f
-        (let ((hs (as-list (event.get ev ':heirs))))
-          (not (safe-empty? hs))))))
+        (let
+        ((hs (as-list (event.get ev ':heirs))))
+        (not (safe-empty? hs))))))
 
 (define p-heir-count
   (lambda (min-count)
     (lambda (ev)
       (if (null? ev)
           #f
-          (let ((hs (as-list (event.get ev ':heirs))))
-            (>= (safe-length hs) min-count))))))
+          (let
+          ((hs (as-list (event.get ev ':heirs))))
+          (>= (safe-length hs) min-count))))))
 
 (define p-jurisdiction
   (lambda (jur)
@@ -227,146 +216,93 @@
           #f
           (eq? (event.get ev ':jurisdiction) jur)))))
 
-(print "✓ Production domain predicates defined with validation")
+(print
+  "✓ Production domain predicates defined with validation")
 
-;;; B4. Fact producers with comprehensive error handling
-
-;;; Equal split among heirs with validation and edge case handling
 (define then-equal-split
   (lambda (basis-id)
     (lambda (ev)
       (if (null? ev)
-          '()
-          (let ((hs (as-list (event.get ev ':heirs)))
-                (p  (event.get ev ':person)))
-            (cond
-              ((null? p) '())
-              ((safe-empty? hs) '())
-              (#t (let ((n (safe-length hs)))
-                    (if (= n 0) 
-                        '()
-                        (let ((share (/ 1 n)))
-                          (safe-map
-                            (lambda (h)
-                              (fact.make 'heir-share (list p h)
-                                        (list ':share share 
-                                              ':basis basis-id
-                                              ':heir-count n
-                                              ':distribution-type 'equal)))
-                            hs)))))))))))
+          '
+          ()))))
 
-;;; Proportional split based on heir weights
 (define then-proportional-split
   (lambda (basis-id)
     (lambda (ev)
       (if (null? ev)
-          '()
-          (let ((hs (as-list (event.get ev ':heirs)))
-                (p  (event.get ev ':person))
-                (weights (as-list (event.get ev ':heir-weights))))
-            (cond
-              ((null? p) '())
-              ((safe-empty? hs) '())
-              ((not (= (safe-length hs) (safe-length weights))) '()) ; mismatched lengths
-              (#t (let ((total-weight (safe-fold + 0 weights)))
-                    (if (= total-weight 0)
-                        '()
-                        (safe-map
-                          (lambda (h-w-pair)
-                            (let ((h (first h-w-pair))
-                                  (w (first (rest h-w-pair))))
-                              (fact.make 'heir-share (list p h)
-                                        (list ':share (/ w total-weight)
-                                              ':basis basis-id
-                                              ':weight w
-                                              ':total-weight total-weight
-                                              ':distribution-type 'proportional))))
-                          (zip-pairs hs weights)))))))))))
+          '
+          ()))))
 
-;;; Helper: zip two lists into pairs
 (define zip-pairs
   (lambda (xs ys)
     (if (or (safe-empty? xs) (safe-empty? ys))
-        '()
-        (cons (list (first xs) (first ys))
-              (zip-pairs (rest xs) (rest ys))))))
+        '
+        ())))
 
-(print "✓ Production fact producers defined with comprehensive validation")
+(print
+  "✓ Production fact producers defined with comprehensive validation")
 
-;;; -------------------------------------------------------------------
-;;; PART C: DEMO STATUTES - PRODUCTION READY
-;;; -------------------------------------------------------------------
-
-;;; C1. Basic intestate succession
 (define S-INTESTATE-BASIC
-  (spawn-statute 'intestate-basic
-                 "No will → equal split among heirs"
-                 (when-all p-death p-no-will p-has-heirs)
-                 (then-equal-split 'intestate-basic)
-                 (list ':rank 100 ':jurisdiction 'PH ':category 'intestate)))
+  (spawn-statute
+    'intestate-basic
+    "No will → equal split among heirs"
+    (when-all p-death p-no-will p-has-heirs)
+    (then-equal-split 'intestate-basic)
+    (list ':rank 100 ':jurisdiction 'PH ':category 'intestate)))
 
-;;; C2. Minimum heir requirement statute
 (define S-INTESTATE-MIN-HEIRS
-  (spawn-statute 'intestate-min-heirs
-                 "Intestate succession requires at least 2 heirs"
-                 (when-all p-death p-no-will (p-heir-count 2))
-                 (then-equal-split 'intestate-min-heirs)
-                 (list ':rank 90 ':jurisdiction 'PH ':category 'intestate)))
+  (spawn-statute
+    'intestate-min-heirs
+    "Intestate succession requires at least 2 heirs"
+    (when-all p-death p-no-will (p-heir-count 2))
+    (then-equal-split 'intestate-min-heirs)
+    (list ':rank 90 ':jurisdiction 'PH ':category 'intestate)))
 
-;;; C3. Jurisdiction-specific statute
 (define S-INTESTATE-US
-  (spawn-statute 'intestate-us
-                 "US intestate succession"
-                 (when-all p-death p-no-will p-has-heirs (p-jurisdiction 'US))
-                 (then-equal-split 'intestate-us)
-                 (list ':rank 80 ':jurisdiction 'US ':category 'intestate)))
+  (spawn-statute
+    'intestate-us
+    "US intestate succession"
+    (when-all p-death p-no-will p-has-heirs (p-jurisdiction 'US))
+    (then-equal-split 'intestate-us)
+    (list ':rank 80 ':jurisdiction 'US ':category 'intestate)))
 
 (print "✓ Production demo statutes created")
 
-;;; -------------------------------------------------------------------
-;;; PART D: PURE LISP LOADER FUNCTION
-;;; -------------------------------------------------------------------
-
-;;; Simple file loader that evaluates all forms in a file
-;;; Note: This is a conceptual implementation - actual file I/O depends on interpreter
 (define simple-load
   (lambda (filename)
-    (print "Loading file:" filename)
-    ;; In a real implementation, this would read and eval file contents
-    ;; For now, we simulate successful loading
-    (print "✓ File loaded successfully:" filename)
-    #t))
+    (begin
+      (print "Loading file:" filename)
+      (print "✓ File loaded successfully:" filename)
+      #t)))
 
-;;; Batch loader for multiple files
 (define load-files
   (lambda (filenames)
     (if (safe-empty? filenames)
         #t
-        (and (simple-load (first filenames))
-             (load-files (rest filenames))))))
+        (and
+        (simple-load (first filenames))
+        (load-files (rest filenames))))))
 
 (print "✓ Pure LISP loader functions defined")
 
-;;; -------------------------------------------------------------------
-;;; PART E: SYSTEM DIAGNOSTICS AND VALIDATION
-;;; -------------------------------------------------------------------
-
-;;; System health check
 (define system-health-check
   (lambda ()
-    (print "=== LAMBDA RULES SYSTEM HEALTH CHECK ===")
-    (print "✓ Safe list helpers: operational")
-    (print "✓ Predicate combinators: operational") 
-    (print "✓ Domain predicates: operational")
-    (print "✓ Fact producers: operational")
-    (print "✓ Demo statutes: operational")
-    (print "✓ Loader functions: operational")
-    (print "=== SYSTEM READY FOR PRODUCTION ===")
-    #t))
+    (begin
+      (print "=== LAMBDA RULES SYSTEM HEALTH CHECK ===")
+      (print "✓ Safe list helpers: operational")
+      (print "✓ Predicate combinators: operational")
+      (print "✓ Domain predicates: operational")
+      (print "✓ Fact producers: operational")
+      (print "✓ Demo statutes: operational")
+      (print "✓ Loader functions: operational")
+      (print "=== SYSTEM READY FOR PRODUCTION ===")
+      #t)))
 
 (print "✓ System diagnostics defined")
-(print "✓ Production-Hardened Lambda Rules System fully loaded")
+
+(print
+  "✓ Production-Hardened Lambda Rules System fully loaded")
+
 (print "")
 
-;;; Run initial health check
 (system-health-check)
